@@ -64,33 +64,18 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Card(
-                margin: const EdgeInsets.all(20),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_isAuthenticating)
-                        const CircularProgressIndicator()
-                      else
-                        SignInButton(
-                          Buttons.google,
-                          onPressed: _signInWithGoogle,
-                          text: 'Sign in with Google',
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (_isAuthenticating)
+            const CircularProgressIndicator()
+          else
+            SignInButton(
+              Buttons.google,
+              onPressed: _signInWithGoogle,
+              text: 'Sign in with Google',
+            ),
+        ],
       ),
     );
   }
