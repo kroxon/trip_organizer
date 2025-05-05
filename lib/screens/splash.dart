@@ -6,11 +6,23 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('FlutterChat'),
-      ),
-      body: const Center(
-        child: Text('Loading...'),
+      body: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+          color: Colors.white,
+          strokeWidth: 2.0,
+        ),
+          SizedBox(height: 20),
+          Text(
+            'Loading...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ] 
       ),
     );
   }

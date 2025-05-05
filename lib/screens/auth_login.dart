@@ -51,6 +51,7 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
       setState(() {
         _isAuthenticating = false;
       });
+      print('Error: $error');
     } finally {
       if (mounted) {
         setState(() {
