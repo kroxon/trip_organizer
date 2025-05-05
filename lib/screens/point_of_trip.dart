@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:trip_organizer/models/trip.dart';
 import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:trip_organizer/models/trip_point.dart';
 
-class TripDetailScreen extends StatefulWidget {
-  const TripDetailScreen({super.key, this.trip, required this.isEditing});
+class PointOfTripScreen extends StatefulWidget {
+  const PointOfTripScreen({super.key, this.tripPoint, required this.isEditing});
 
-  final Trip? trip;
+  final TripPoint? tripPoint;
   final bool isEditing;
 
   @override
-  State<TripDetailScreen> createState() {
-    return _TripDetailScreenState();
+  State<PointOfTripScreen> createState() {
+    return _PointOfTripScreenState();
   }
 }
 
-class _TripDetailScreenState extends State<TripDetailScreen> {
+class _PointOfTripScreenState extends State<PointOfTripScreen> {
   late bool _isEditing;
   final _textController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -31,7 +31,7 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.trip?.title ?? 'New Trip'),
+        title: Text(widget.tripPoint?.place ?? 'New Point of Trip'),
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit),
@@ -55,11 +55,25 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               child: GooglePlacesAutoCompleteTextFormField(
                 textEditingController: _textController,
                 googleAPIKey: dotenv.env['YOUR_GOOGLE_API_KEY']!,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Enter your destination',
-                  labelText: 'Address',
+                  labelText: 'Destination',
+                  prefixIcon: Icon(
+                    Icons.search,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      _textController.clear();
+                    },
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
                   labelStyle: TextStyle(color: Colors.purple),
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {

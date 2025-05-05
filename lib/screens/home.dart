@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_organizer/data/trips.dart';
-import 'package:trip_organizer/screens/trip_detail.dart';
+import 'package:trip_organizer/screens/trip.dart';
 import 'package:trip_organizer/widgets/floating_action_btn.dart';
 import 'package:trip_organizer/widgets/main_drawer.dart';
 import 'package:trip_organizer/widgets/trip_card.dart';
 
-class TravelsScreen extends ConsumerStatefulWidget {
-  const TravelsScreen({super.key});
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  ConsumerState<TravelsScreen> createState() {
-    return _TravelsScreenState();
+  ConsumerState<HomeScreen> createState() {
+    return _HomeScreenState();
   }
 }
 
-class _TravelsScreenState extends ConsumerState<TravelsScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,16 +30,12 @@ class _TravelsScreenState extends ConsumerState<TravelsScreen> {
           itemBuilder: (ctx, index) {
             final trip = sampleTrips[index];
             return TripCard(
-              title: trip.title,
-              startDate: trip.startDate,
-              weather: trip.weather ?? 'Unknown',
-              completedChecklistItems: trip.completedChecklistItems,
-              totalChecklistItems: trip.totalChecklistItems,
+              trip: trip,
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TripDetailScreen(
+                    builder: (context) => TripScreen(
                       trip: trip,
                       isEditing: false,
                     ),
@@ -51,11 +47,12 @@ class _TravelsScreenState extends ConsumerState<TravelsScreen> {
         ),
       ),
       floatingActionButton: CustomFloatingActionButton(
+        label: 'New Travel',
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const TripDetailScreen(isEditing: true),
+              builder: (context) => const TripScreen(isEditing: true),
             ),
           );
         },

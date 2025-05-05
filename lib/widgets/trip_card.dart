@@ -1,35 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:trip_organizer/models/trip.dart';
 
 class TripCard extends StatelessWidget {
-  final String title;
-  final DateTime startDate;
-  final String weather;
-  final int completedChecklistItems;
-  final int totalChecklistItems;
-  final void Function()? onTap;
-
   const TripCard({
     super.key,
-    required this.title,
-    required this.startDate,
-    required this.weather,
-    required this.completedChecklistItems,
-    required this.totalChecklistItems,
+    required this.trip,
     required this.onTap,
   });
+
+  final Trip trip;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final formattedDate = DateFormat('dd.MM.yyyy').format(startDate);
+    final formattedDate = DateFormat('dd.MM.yyyy').format(trip.startDate);
 
     return Card(
       elevation: 4.0,
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      color: colorScheme.surfaceContainerHigh, 
+      color: colorScheme.surfaceContainerHigh,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -38,30 +31,35 @@ class TripCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title,
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface),
+                trip.title,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 8.0),
               Row(
                 children: [
-                  Icon(Icons.calendar_today_outlined, color: colorScheme.primary, size: 16.0),
+                  Icon(Icons.calendar_today_outlined,
+                      color: colorScheme.primary, size: 16.0),
                   const SizedBox(width: 8.0),
                   Text(
                     formattedDate,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
               const SizedBox(height: 8.0),
               Row(
                 children: [
-                  Icon(Icons.wb_sunny_outlined, color: colorScheme.tertiary, size: 16.0),
+                  Icon(Icons.wb_sunny_outlined,
+                      color: colorScheme.tertiary, size: 16.0),
                   const SizedBox(width: 8.0),
                   Text(
-                    weather,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                    trip.weather ?? 'Unknown',
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
@@ -69,16 +67,19 @@ class TripCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    completedChecklistItems == totalChecklistItems
+                    trip.completedChecklistItems == trip.totalChecklistItems
                         ? Icons.check_circle_outline
                         : Icons.playlist_add_check_outlined,
-                    color: completedChecklistItems == totalChecklistItems ? colorScheme.secondary : colorScheme.onSurfaceVariant,
+                    color: trip.completedChecklistItems == trip.totalChecklistItems
+                        ? colorScheme.secondary
+                        : colorScheme.onSurfaceVariant,
                     size: 16.0,
                   ),
                   const SizedBox(width: 8.0),
                   Text(
-                    '$completedChecklistItems / $totalChecklistItems of the items collected',
-                    style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                    '${trip.completedChecklistItems} / ${trip.totalChecklistItems} of the items collected',
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:trip_organizer/providers/theme_provider.dart'; 
+import 'package:trip_organizer/providers/theme_provider.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
-  const CustomFloatingActionButton({super.key, required this.onPressed});
+  const CustomFloatingActionButton(
+      {super.key, required this.onPressed, required this.label});
   final void Function() onPressed;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +14,11 @@ class CustomFloatingActionButton extends StatelessWidget {
       builder: (context, ref, child) {
         final themeMode = ref.watch(themeProvider);
         final isDarkMode = themeMode == ThemeMode.dark;
-        
+
         return FloatingActionButton.extended(
           onPressed: onPressed,
           label: Text(
-            'New Travel',
+            label,
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                   color: isDarkMode
                       ? Colors.white
@@ -30,9 +32,8 @@ class CustomFloatingActionButton extends StatelessWidget {
                 ? Colors.white
                 : Theme.of(context).colorScheme.primary,
           ),
-          backgroundColor: isDarkMode
-              ? Theme.of(context).colorScheme.primary
-              : Colors.white,
+          backgroundColor:
+              isDarkMode ? Theme.of(context).colorScheme.primary : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: isDarkMode

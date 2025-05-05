@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_organizer/screens/auth_login.dart';
 import 'package:trip_organizer/screens/splash.dart';
-import 'package:trip_organizer/screens/travels.dart';
+import 'package:trip_organizer/screens/home.dart';
 import 'package:trip_organizer/providers/theme_provider.dart';
 import 'package:trip_organizer/theme/app_theme.dart';
 import 'package:trip_organizer/theme/color_schemes.dart';
@@ -17,9 +17,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   try {
-    await dotenv.load(fileName: ".env"); // Load environment variables
+    await dotenv.load(fileName: ".env"); 
   } catch (e) {
-    throw Exception('Error loading .env file: $e'); // Print error if any
+    throw Exception('Error loading .env file: $e');
   }
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -44,7 +44,7 @@ class MyApp extends ConsumerWidget {
           }
 
           if (snapshot.hasData) {
-            return const TravelsScreen();
+            return const HomeScreen();
           }
 
           return const AuthLoginScreen();

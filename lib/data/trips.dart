@@ -1,6 +1,6 @@
 import 'package:trip_organizer/models/trip.dart';
 import 'package:trip_organizer/models/checklist_item.dart';
-import 'package:trip_organizer/models/itinerary_item.dart';
+import 'package:trip_organizer/models/trip_point.dart';
 
 final List<Trip> sampleTrips = [
   Trip(
@@ -12,13 +12,13 @@ final List<Trip> sampleTrips = [
     ],
     startDate: DateTime(2025, 6, 15),
     weather: 'Sunny, 22°C',
-    itinerary: [
-      ItineraryItem(
+    tripPoints: [
+      TripPoint(
         place: 'Mountain trail hiking',
         date: DateTime(2025, 6, 15, 9, 0),
         weather: 'Moderate difficulty trail, 4 hours',
       ),
-      ItineraryItem(
+      TripPoint(
         place: 'Picnic lunch',
         date: DateTime(2025, 6, 15, 13, 0),
         weather: 'Rest at viewpoint',
@@ -34,13 +34,13 @@ final List<Trip> sampleTrips = [
     ],
     startDate: DateTime(2025, 7, 1),
     weather: 'Cloudy, 19°C',
-    itinerary: [
-      ItineraryItem(
+    tripPoints: [
+      TripPoint(
         place: 'Eiffel Tower visit',
         date: DateTime(2025, 7, 1, 10, 0),
         weather: 'Book tickets in advance',
       ),
-      ItineraryItem(
+      TripPoint(
         place: 'Louvre Museum',
         date: DateTime(2025, 7, 1, 14, 0),
         weather: 'Guided tour',

@@ -1,4 +1,4 @@
-class ItineraryItem {
+class TripPoint {
   final String place;
   final DateTime date;
   final List<String>? ticketUrls;
@@ -7,7 +7,7 @@ class ItineraryItem {
   final List<String>? links;
   final String? weather;
 
-  ItineraryItem({
+  TripPoint({
     required this.place,
     required this.date,
     this.ticketUrls,
