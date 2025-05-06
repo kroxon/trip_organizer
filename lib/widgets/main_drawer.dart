@@ -19,7 +19,7 @@ class MainDrawer extends ConsumerWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Theme.of(context).colorScheme.primaryContainer,
+                  Theme.of(context).colorScheme.onSurface,
                   Theme.of(context).colorScheme.primaryContainer.withAlpha(160),
                 ],
                 begin: Alignment.topLeft,
