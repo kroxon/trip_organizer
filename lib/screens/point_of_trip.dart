@@ -31,7 +31,8 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.tripPoint?.place ?? 'New Point of Trip'),
+        title: Text(
+            widget.tripPoint?.tripPointLocation.place ?? 'New Point of Trip'),
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.check : Icons.edit),

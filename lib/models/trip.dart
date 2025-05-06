@@ -4,14 +4,13 @@ import 'package:trip_organizer/models/trip_point.dart';
 class Trip {
   final String title;
   final List<ChecklistItem> checklist;
-  final DateTime startDate;
   final String? weather;
   final List<TripPoint> tripPoints;
+  bool archived = false;
 
   Trip({
     required this.title,
     required this.checklist,
-    required this.startDate,
     this.weather,
     required this.tripPoints,
   });
@@ -20,4 +19,9 @@ class Trip {
   int get completedChecklistItems =>
       checklist.where((item) => item.isChecked).length;
   int get totalChecklistItems => checklist.length;
+  DateTime get startDate => tripPoints.first.startDate;
+  DateTime? get endDate => tripPoints.last.endDate;
+  void archiveTripToggle() {
+    archived = !archived;
+  }
 }

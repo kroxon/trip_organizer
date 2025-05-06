@@ -19,7 +19,7 @@ class _TripScreenState extends State<TripScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Trip Details'),
+        title: Text(widget.trip != null ? widget.trip!.title : 'New Trip'),
       ),
       body: Center(
         child: ListView.builder(

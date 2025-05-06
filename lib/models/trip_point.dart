@@ -1,6 +1,19 @@
-class TripPoint {
+class TripPointLocation {
+  const TripPointLocation({
+    required this.latitude,
+    required this.longitude,
+    required this.place,
+  });
+
+  final double latitude;
+  final double longitude;
   final String place;
-  final DateTime date;
+}
+
+class TripPoint {
+  final TripPointLocation tripPointLocation;
+  final DateTime startDate;
+  final DateTime? endDate;
   final List<String>? ticketUrls;
   final String? notes;
   final String? googleMapsUrl;
@@ -8,8 +21,9 @@ class TripPoint {
   final String? weather;
 
   TripPoint({
-    required this.place,
-    required this.date,
+    required this.tripPointLocation,
+    required this.startDate,
+    this.endDate,
     this.ticketUrls,
     this.notes,
     this.googleMapsUrl,

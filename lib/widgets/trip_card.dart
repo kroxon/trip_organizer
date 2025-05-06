@@ -16,7 +16,10 @@ class TripCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final formattedDate = DateFormat('dd.MM.yyyy').format(trip.startDate);
+
+    String formatterDate(DateTime date) {
+      return DateFormat('dd.MM.yyyy').format(date);
+    }
 
     return Card(
       elevation: 4.0,
@@ -37,51 +40,99 @@ class TripCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Icon(Icons.calendar_today_outlined,
-                      color: colorScheme.primary, size: 16.0),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    formattedDate,
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(color: colorScheme.onSurfaceVariant),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Icon(Icons.wb_sunny_outlined,
-                      color: colorScheme.tertiary, size: 16.0),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    trip.weather ?? 'Unknown',
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(color: colorScheme.onSurfaceVariant),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Icon(
-                    trip.completedChecklistItems == trip.totalChecklistItems
-                        ? Icons.check_circle_outline
-                        : Icons.playlist_add_check_outlined,
-                    color: trip.completedChecklistItems == trip.totalChecklistItems
-                        ? colorScheme.secondary
-                        : colorScheme.onSurfaceVariant,
-                    size: 16.0,
-                  ),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    '${trip.completedChecklistItems} / ${trip.totalChecklistItems} of the items collected',
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(color: colorScheme.onSurfaceVariant),
-                  ),
-                ],
+              SizedBox(
+                height: 100,
+                child: Row(
+                  children: [
+                    Expanded(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 40.0),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 24.0),
+                              Row(
+                                children: [
+                                  Icon(Icons.calendar_today_outlined,
+                                      color: colorScheme.primary, size: 16.0),
+                                  const SizedBox(width: 8.0),
+                                  Text(
+                                    formatterDate(trip.startDate),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onSurfaceVariant),
+                                  ),
+                                  if (trip.endDate != null) ...[
+                                    const Spacer(),
+                                    Icon(Icons.access_time_outlined,
+                                        color: colorScheme.primary, size: 16.0),
+                                    const SizedBox(width: 8.0),
+                                    Text(
+                                      formatterDate(trip.endDate!),
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                              color:
+                                                  colorScheme.onSurfaceVariant),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              SizedBox(
+                                height: 16.0,
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    trip.completedChecklistItems ==
+                                            trip.totalChecklistItems
+                                        ? Icons.check_circle_outline
+                                        : Icons.playlist_add_check_outlined,
+                                    color: trip.completedChecklistItems ==
+                                            trip.totalChecklistItems
+                                        ? colorScheme.secondary
+                                        : colorScheme.onSurfaceVariant,
+                                    size: 16.0,
+                                  ),
+                                  Text(
+                                    '${trip.completedChecklistItems} / ${trip.totalChecklistItems} of the items collected',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: colorScheme.onSurfaceVariant),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )),
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.wb_sunny_outlined,
+                              color: colorScheme.tertiary,
+                              size: 16.0,
+                            ),
+                            const SizedBox(
+                                height: 4.0), // Changed from width to height
+                            Text(
+                              trip.weather ?? 'Unknown',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ],
           ),
