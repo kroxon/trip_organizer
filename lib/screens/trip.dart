@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:trip_organizer/models/checklist_item.dart';
 import 'package:trip_organizer/models/trip.dart';
 import 'package:trip_organizer/screens/point_of_trip.dart';
 import 'package:trip_organizer/widgets/check_list_dialog.dart';
 import 'package:trip_organizer/widgets/floating_action_btn.dart';
+import 'package:trip_organizer/widgets/tickets_card.dart';
 import 'package:trip_organizer/widgets/trip_point_card.dart';
 
 class TripScreen extends StatefulWidget {
@@ -19,27 +21,17 @@ class _TripScreenState extends State<TripScreen> {
   Trip? trip;
 
   void _showChecklistDialog(BuildContext context) async {
-    final List<String> checklistItems = [
-      'Opcja 1',
-      'Opcja 2',
-      'Opcja 3',
-      'Opcja 4',
-    ];
-    final List<bool> initialValues = List.generate(
-      checklistItems.length,
-      (index) => false,
-    );
+    if (trip == null) return;
 
-    final result = await showDialog<List<bool>>(
+    final result = await showDialog<List<ChecklistItem>>(
       context: context,
       builder: (BuildContext context) {
         return ChecklistAlertDialog(
-          items: checklistItems,
-          initialCheckedItems: initialValues,
-          onChecklistChanged: (List<bool> updatedCheckedItems) {
-            // Handle changes here if needed
+          checklistItems: trip!.checklist,
+          onChecklistChanged: (List<ChecklistItem> updatedItems) {
             setState(() {
-              // Update your checklist state here
+              trip!.checklist.clear();
+              trip!.checklist.addAll(updatedItems);
             });
           },
         );
@@ -48,10 +40,8 @@ class _TripScreenState extends State<TripScreen> {
 
     if (result != null) {
       setState(() {
-        // Update the trip's checklist based on result
-        for (int i = 0; i < result.length; i++) {
-          trip?.checklist[i].isChecked = result[i];
-        }
+        trip!.checklist.clear();
+        trip!.checklist.addAll(result);
       });
     }
   }
@@ -139,7 +129,7 @@ class _TripScreenState extends State<TripScreen> {
                 ),
               ),
             Row(
-              children: [Text('Tickets')],
+              children: [Expanded(child: TicketsCard())],
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),

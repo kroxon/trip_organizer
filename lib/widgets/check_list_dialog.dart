@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:trip_organizer/models/checklist_item.dart';
 
 class ChecklistAlertDialog extends StatefulWidget {
   const ChecklistAlertDialog({
     super.key,
-    required this.items,
-    required this.initialCheckedItems,
+    required this.checklistItems,
     required this.onChecklistChanged,
   });
 
-  final List<String> items;
-  final List<bool> initialCheckedItems;
-  final Function(List<bool>) onChecklistChanged;
+  final List<ChecklistItem> checklistItems;
+  final Function(List<ChecklistItem>) onChecklistChanged;
 
   @override
   State<ChecklistAlertDialog> createState() => _ChecklistAlertDialogState();
 }
 
 class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
-  late List<bool> _checkedItems;
-  late List<String> _items;
+  late List<ChecklistItem> _items;
   final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _checkedItems = List<bool>.from(widget.initialCheckedItems);
-    _items = List<String>.from(widget.items);
+    _items = List<ChecklistItem>.from(widget.checklistItems);
   }
 
   @override
@@ -37,20 +34,18 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
   void _addItem() {
     if (_textController.text.isNotEmpty) {
       setState(() {
-        _items.add(_textController.text);
-        _checkedItems.add(false);
+        _items.add(ChecklistItem(name: _textController.text));
         _textController.clear();
       });
-      widget.onChecklistChanged(_checkedItems);
+      widget.onChecklistChanged(_items);
     }
   }
 
   void _removeItem(int index) {
     setState(() {
       _items.removeAt(index);
-      _checkedItems.removeAt(index);
     });
-    widget.onChecklistChanged(_checkedItems);
+    widget.onChecklistChanged(_items);
   }
 
   @override
@@ -70,7 +65,7 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
                 itemCount: _items.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Dismissible(
-                    key: Key(_items[index]),
+                    key: Key(_items[index].name),
                     direction: DismissDirection.endToStart,
                     background: Container(
                       color: theme.colorScheme.error,
@@ -83,14 +78,14 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
                     ),
                     onDismissed: (direction) => _removeItem(index),
                     child: CheckboxListTile(
-                      title: Text(_items[index]),
-                      value: _checkedItems[index],
+                      title: Text(_items[index].name),
+                      value: _items[index].isChecked,
                       onChanged: (bool? value) {
                         if (value != null) {
                           setState(() {
-                            _checkedItems[index] = value;
+                            _items[index].isChecked = value;
                           });
-                          widget.onChecklistChanged(_checkedItems);
+                          widget.onChecklistChanged(_items);
                         }
                       },
                       contentPadding: EdgeInsets.zero,
@@ -152,7 +147,7 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
             ),
           ),
           onPressed: () {
-            Navigator.of(context).pop(_checkedItems);
+            Navigator.of(context).pop(_items);
           },
         ),
       ],
