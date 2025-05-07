@@ -66,9 +66,13 @@ class _MapScreenState extends State<MapScreen> {
           ),
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openNavigation,
-        child: const Icon(Icons.navigation),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 50.0),
+        child: FloatingActionButton.extended(
+          onPressed: _openNavigation,
+          label: const Text('Navigate'),
+          icon: const Icon(Icons.navigation),
+        ),
       ),
     );
   }

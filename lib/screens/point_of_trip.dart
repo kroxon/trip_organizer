@@ -134,9 +134,6 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                     longitude: double.parse(prediction.lng!),
                   );
                 });
-                print('placeDetails ${prediction.lng}');
-                print('placeDetails ${prediction.lat}');
-                print('placeDetails ${prediction.description}');
               },
               onSuggestionClicked: (Prediction prediction) =>
                   _destinationTextController.text = prediction.description!,

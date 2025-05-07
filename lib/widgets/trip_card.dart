@@ -45,68 +45,75 @@ class TripCard extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                        flex: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 40.0),
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 24.0),
-                              Row(
-                                children: [
-                                  Icon(Icons.calendar_today_outlined,
-                                      color: colorScheme.primary, size: 16.0),
-                                  const SizedBox(width: 8.0),
-                                  Text(
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 24.0),
+                            Row(
+                              children: [
+                                Icon(Icons.calendar_today_outlined,
+                                    color: colorScheme.primary, size: 16.0),
+                                const SizedBox(width: 4.0),
+                                Flexible(
+                                  child: Text(
                                     formatterDate(trip.startDate),
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                         color: colorScheme.onSurfaceVariant),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  if (trip.endDate != null) ...[
-                                    const Spacer(),
-                                    Icon(Icons.access_time_outlined,
-                                        color: colorScheme.primary, size: 16.0),
-                                    const SizedBox(width: 8.0),
-                                    Text(
+                                ),
+                                if (trip.endDate != null) ...[
+                                  const SizedBox(width: 8.0),
+                                  Icon(Icons.access_time_outlined,
+                                      color: colorScheme.primary, size: 16.0),
+                                  const SizedBox(width: 4.0),
+                                  Flexible(
+                                    child: Text(
                                       formatterDate(trip.endDate!),
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(
-                                              color:
-                                                  colorScheme.onSurfaceVariant),
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.onSurfaceVariant),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ],
-                                ],
-                              ),
-                              SizedBox(
-                                height: 16.0,
-                              ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    trip.completedChecklistItems ==
-                                            trip.totalChecklistItems
-                                        ? Icons.check_circle_outline
-                                        : Icons.playlist_add_check_outlined,
-                                    color: trip.completedChecklistItems ==
-                                            trip.totalChecklistItems
-                                        ? colorScheme.secondary
-                                        : colorScheme.onSurfaceVariant,
-                                    size: 16.0,
                                   ),
-                                  Text(
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 16.0),
+                            Row(
+                              children: [
+                                Icon(
+                                  trip.completedChecklistItems ==
+                                          trip.totalChecklistItems
+                                      ? Icons.check_circle_outline
+                                      : Icons.playlist_add_check_outlined,
+                                  color: trip.completedChecklistItems ==
+                                          trip.totalChecklistItems
+                                      ? colorScheme.secondary
+                                      : colorScheme.onSurfaceVariant,
+                                  size: 16.0,
+                                ),
+                                const SizedBox(width: 4.0),
+                                Flexible(
+                                  child: Text(
                                     '${trip.completedChecklistItems} / ${trip.totalChecklistItems} of the items collected',
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                         color: colorScheme.onSurfaceVariant),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     Expanded(
                       flex: 1,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant,
+                          color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
