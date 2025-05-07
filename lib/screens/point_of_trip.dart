@@ -3,6 +3,7 @@ import 'package:google_places_autocomplete_text_field/google_places_autocomplete
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:trip_organizer/models/trip_point.dart';
+import 'package:trip_organizer/widgets/map_image.dart';
 
 class PointOfTripScreen extends StatefulWidget {
   const PointOfTripScreen({super.key, this.tripPoint, required this.isEditing});
@@ -126,11 +127,13 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                 child: child,
               ),
               onPlaceDetailsWithCoordinatesReceived: (prediction) {
-                _tripPointLocation = TripPointLocation(
-                  place: prediction.description!,
-                  latitude: double.parse(prediction.lat!),
-                  longitude: double.parse(prediction.lng!),
-                );
+                setState(() {
+                  _tripPointLocation = TripPointLocation(
+                    place: prediction.description!,
+                    latitude: double.parse(prediction.lat!),
+                    longitude: double.parse(prediction.lng!),
+                  );
+                });
                 print('placeDetails ${prediction.lng}');
                 print('placeDetails ${prediction.lat}');
                 print('placeDetails ${prediction.description}');
@@ -139,6 +142,9 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                   _destinationTextController.text = prediction.description!,
               minInputLength: 3,
             ),
+
+            const SizedBox(height: 20),
+            if (_tripPointLocation != null) MapImage(location: _tripPointLocation!),
 
             const SizedBox(height: 20),
             // button do usunięcia
@@ -223,8 +229,7 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
-                  borderSide: BorderSide(
-                      color: Colors.grey),
+                  borderSide: BorderSide(color: Colors.grey),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
