@@ -16,16 +16,6 @@ class MainDrawer extends ConsumerWidget {
         children: [
           DrawerHeader(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.onSurface,
-                  Theme.of(context).colorScheme.primaryContainer.withAlpha(160),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
             child: Row(
               children: [
                 Icon(
@@ -37,8 +27,8 @@ class MainDrawer extends ConsumerWidget {
                 Text(
                   'Trip Organizer!',
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                 ),
               ],
             ),
@@ -48,9 +38,9 @@ class MainDrawer extends ConsumerWidget {
             title: Text(
               isDarkMode ? 'Light Mode' : 'Dark Mode',
               style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontSize: 24,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 24,
+                  ),
             ),
             onTap: () {
               ref.read(themeProvider.notifier).state =
@@ -66,9 +56,9 @@ class MainDrawer extends ConsumerWidget {
             title: Text(
               'Logout',
               style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontSize: 24,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 24,
+                  ),
             ),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
@@ -77,8 +67,8 @@ class MainDrawer extends ConsumerWidget {
                   content: Text(
                     'Logged out successfully!',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                   ),
                   backgroundColor:
                       Theme.of(context).colorScheme.surfaceContainerHigh,

@@ -34,15 +34,39 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
     final now = DateTime.now();
     final firstDate = DateTime(now.year - 2, now.month, now.day);
     final lastDate = DateTime(now.year + 5, now.month, now.day);
+
+    if (start == 'end' && _selectedStartDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select start date first'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    final initialDate = start == 'end' && _selectedStartDate != null
+        ? _selectedStartDate!
+        : now;
+
+    final firstAllowedDate = start == 'end' && _selectedStartDate != null
+        ? _selectedStartDate!
+        : firstDate;
+
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: now,
-      firstDate: firstDate,
+      initialDate: initialDate,
+      firstDate: firstAllowedDate,
       lastDate: lastDate,
     );
     setState(() {
       if (start == 'start') {
         _selectedStartDate = pickedDate;
+        if (_selectedEndDate != null &&
+            pickedDate != null &&
+            _selectedEndDate!.isBefore(pickedDate)) {
+          _selectedEndDate = null;
+        }
       } else {
         _selectedEndDate = pickedDate;
       }
@@ -141,7 +165,7 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                   if (_tripPoint!.endDate != null)
                     Row(
                       children: [
-                        Icon(Icons.access_time_outlined,
+                        Icon(Icons.calendar_today_outlined,
                             color: Theme.of(context).colorScheme.primary,
                             size: 16.0),
                         const SizedBox(width: 4.0),
@@ -390,6 +414,16 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
       setState(() {
         _autovalidateMode = AutovalidateMode.always;
       });
+      return;
+    }
+
+    if (_selectedEndDate != null && _selectedEndDate!.isBefore(_selectedStartDate!)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('End date must be after start date'),
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     }
 

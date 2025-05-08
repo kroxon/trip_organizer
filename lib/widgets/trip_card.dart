@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:trip_organizer/models/trip.dart';
+import 'package:trip_organizer/widgets/weather_container.dart';
 
 class TripCard extends StatelessWidget {
   const TripCard({
@@ -41,7 +42,6 @@ class TripCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               SizedBox(
-                height: 100,
                 child: Row(
                   children: [
                     Expanded(
@@ -66,14 +66,16 @@ class TripCard extends StatelessWidget {
                                 ),
                                 if (trip.endDate != null) ...[
                                   const SizedBox(width: 8.0),
-                                  Icon(Icons.access_time_outlined,
+                                  Icon(Icons.calendar_today_outlined,
                                       color: colorScheme.primary, size: 16.0),
                                   const SizedBox(width: 4.0),
                                   Flexible(
                                     child: Text(
                                       formatterDate(trip.endDate!),
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                          color: colorScheme.onSurfaceVariant),
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                              color:
+                                                  colorScheme.onSurfaceVariant),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -111,32 +113,7 @@ class TripCard extends StatelessWidget {
                     ),
                     Expanded(
                       flex: 1,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.wb_sunny_outlined,
-                              color: colorScheme.tertiary,
-                              size: 16.0,
-                            ),
-                            const SizedBox(
-                                height: 4.0), // Changed from width to height
-                            Text(
-                              trip.weather ?? 'Unknown',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: WeatherContainer(tripPoint: trip.tripPoints.first),
                     )
                   ],
                 ),

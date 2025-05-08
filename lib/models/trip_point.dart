@@ -38,4 +38,15 @@ class TripPoint {
     this.links,
     this.weather,
   });
+
+  String get formattedStartDate {
+    return '${startDate.day}.${startDate.month}.${startDate.year}';
+  }
+
+  String get formattedEndDate {
+    if (endDate == null) {
+      return '';
+    }
+    return '${endDate!.day}.${endDate!.month}.${endDate!.year}';
+  }
 }

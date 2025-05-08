@@ -45,7 +45,7 @@ class _WeatherContainerState extends State<WeatherContainer> {
     if (startDate.difference(now).inDays > 5) {
       setState(() {
         error =
-            'Weather forecast not available yet.\nCheck again ${5 - startDate.difference(now).inDays} days before the trip.';
+            'Weather forecast not available yet.\nCheck again ${5 - startDate.difference(now).inDays} days.';
         isLoading = false;
       });
       return;
@@ -97,10 +97,11 @@ class _WeatherContainerState extends State<WeatherContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150,
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(8.0),
+      width: 120,
       decoration: BoxDecoration(
       color: Colors.white,
+      
       //       gradient: const LinearGradient(
       //   colors: [
       //   Color.fromARGB(255, 209, 228, 240), // jasny niebieski
