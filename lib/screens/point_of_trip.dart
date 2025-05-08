@@ -52,11 +52,21 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
   void initState() {
     super.initState();
     _isEditing = widget.isEditing;
+
+    if (widget.tripPoint != null) {
+      _tripPoint = widget.tripPoint;
+      _destinationTextController.text = _tripPoint!.tripPointLocation.place;
+      _selectedStartDate = _tripPoint!.startDate;
+      _selectedEndDate = _tripPoint!.endDate;
+      _notesTextController.text = _tripPoint!.notes ?? '';
+      _tripPointLocation = _tripPoint!.tripPointLocation;
+    }
   }
 
   @override
   void dispose() {
     _destinationTextController.dispose();
+    _notesTextController.dispose();
     super.dispose();
   }
 
@@ -64,23 +74,104 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
   Widget build(BuildContext context) {
     final DateFormat formatter = DateFormat('dd.MM.yyyy');
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-            widget.tripPoint?.tripPointLocation.place ?? 'New Point of Trip'),
-        actions: [
-          IconButton(
-            icon: Icon(_isEditing ? Icons.check : Icons.edit),
-            onPressed: () {
-              if (_isEditing == true) Navigator.of(context).pop();
-              setState(() {
-                _isEditing = !_isEditing;
-              });
-            },
+    Widget content = const Center(
+      child: CircularProgressIndicator(),
+    );
+
+    if (!_isEditing && widget.tripPoint != null) {
+      _tripPoint = widget.tripPoint;
+      content = Column(
+        children: [
+          const SizedBox(height: 20),
+          Text(_tripPoint!.tripPointLocation.place,
+              style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  )),
+          const SizedBox(height: 20),
+          MapImage(location: _tripPoint!.tripPointLocation),
+          const SizedBox(height: 20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Start date',
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                              color:
+                                  Theme.of(context).colorScheme.onSurfaceVariant,
+                            )),
+                    SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_today_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 16.0),
+                        const SizedBox(width: 4.0),
+                        Text(
+                          formatter.format(_tripPoint!.startDate),
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: 40,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('End date',
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          )),
+                  SizedBox(height: 5),
+                  if (_tripPoint!.endDate != null)
+                    Row(
+                      children: [
+                        Icon(Icons.access_time_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 16.0),
+                        const SizedBox(width: 4.0),
+                        Text(
+                          formatter.format(_tripPoint!.endDate!),
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ],
           ),
+          const SizedBox(
+            height: 20,
+          ),
+          if (_tripPoint!.notes != null)
+            Text(
+              _tripPoint!.notes!,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
         ],
-      ),
-      body: Padding(
+      );
+    } else if (_isEditing) {
+      content = Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
@@ -141,10 +232,11 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
             ),
 
             const SizedBox(height: 20),
-            if (_tripPointLocation != null) MapImage(location: _tripPointLocation!),
+            if (_tripPointLocation != null)
+              MapImage(location: _tripPointLocation!),
 
             const SizedBox(height: 20),
-            // button do usunięcia
+            // button do usunięcia po testach
             // TextButton(
             //   onPressed: _onSubmit,
             //   child: const Text('Submit'),
@@ -241,8 +333,26 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
             ),
           ]),
         ),
-      ),
-    );
+      );
+    }
+
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(
+              widget.tripPoint?.tripPointLocation.place ?? 'New Point of Trip'),
+          actions: [
+            IconButton(
+              icon: Icon(_isEditing ? Icons.check : Icons.edit),
+              onPressed: () {
+                if (_isEditing == true) Navigator.of(context).pop();
+                setState(() {
+                  _isEditing = !_isEditing;
+                });
+              },
+            ),
+          ],
+        ),
+        body: content);
   }
 
   Future<void> _onSubmit() async {
