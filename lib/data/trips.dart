@@ -73,4 +73,47 @@ final List<Trip> sampleTrips = [
       ),
     ],
   ),
+  Trip(
+    title: 'Beach Vacation',
+    checklist: [
+      ChecklistItem(name: 'Sunscreen', isChecked: true),
+      ChecklistItem(name: 'Swimsuit', isChecked: false),
+      ChecklistItem(name: 'Beach towel', isChecked: true),
+    ],
+    weather: 'Sunny, 30°C',
+    tripPoints: [
+      TripPoint(
+        tripPointLocation: TripPointLocation(
+          latitude: 36.7783,
+          longitude: -119.4179,
+          place: 'Beach Resort',
+        ),
+        // ustaw od 8 maja do 12 maja
+        startDate: DateTime(2025, 5, 8, 10, 0),
+        endDate: DateTime(2025, 5, 12, 18, 0),
+        weather: 'Relax at the beach',
+      ),
+    ],
+  ),
+  Trip(
+    title: 'Camping Trip',
+    checklist: [
+      ChecklistItem(name: 'Tent', isChecked: true),
+      ChecklistItem(name: 'Sleeping bag', isChecked: false),
+      ChecklistItem(name: 'Camping stove', isChecked: true),
+    ],
+    weather: 'Clear skies, 15°C',
+    tripPoints: [
+      TripPoint(
+        tripPointLocation: TripPointLocation(
+          latitude: 40.7128,
+          longitude: -74.0060,
+          place: 'Campsite',
+        ),
+        startDate: DateTime(2025, 5, 11, 10, 0),
+        endDate: DateTime(2025, 5, 12, 12, 0),
+        weather: 'Set up camp and relax',
+      ),
+    ],
+  ),
 ];

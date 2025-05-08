@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:trip_organizer/models/trip_point.dart';
 import 'package:trip_organizer/widgets/map_image.dart';
+import 'package:trip_organizer/widgets/weather_container.dart';
 
 class PointOfTripScreen extends StatefulWidget {
   const PointOfTripScreen({super.key, this.tripPoint, required this.isEditing});
@@ -100,8 +101,9 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                   children: [
                     Text('Start date',
                         style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                              color:
-                                  Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             )),
                     SizedBox(height: 5),
                     Row(
@@ -168,6 +170,10 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
+          const SizedBox(
+            height: 20,
+          ),
+          WeatherContainer(tripPoint: widget.tripPoint!),
         ],
       );
     } else if (_isEditing) {
@@ -236,11 +242,7 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
               MapImage(location: _tripPointLocation!),
 
             const SizedBox(height: 20),
-            // button do usunięcia po testach
-            // TextButton(
-            //   onPressed: _onSubmit,
-            //   child: const Text('Submit'),
-            // ),
+
             Row(
               children: [
                 Column(
@@ -255,10 +257,31 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                                 )),
                     Row(
                       children: [
-                        Text(
-                          _selectedStartDate == null
-                              ? 'Select start date'
-                              : formatter.format(_selectedStartDate!),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _selectedStartDate == null
+                                  ? 'Select start date'
+                                  : formatter.format(_selectedStartDate!),
+                              style: TextStyle(
+                                color: _selectedStartDate == null &&
+                                        _autovalidateMode ==
+                                            AutovalidateMode.always
+                                    ? Theme.of(context).colorScheme.error
+                                    : null,
+                              ),
+                            ),
+                            if (_selectedStartDate == null &&
+                                _autovalidateMode == AutovalidateMode.always)
+                              Text(
+                                'Start date is required',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                  fontSize: 12,
+                                ),
+                              ),
+                          ],
                         ),
                         IconButton(
                           onPressed: () => _presentDatePicker('start'),
@@ -338,16 +361,21 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-              widget.tripPoint?.tripPointLocation.place ?? 'New Point of Trip'),
+          title: Text(_isEditing
+              ? (_tripPointLocation?.place ?? 'New Point of Trip')
+              : (widget.tripPoint?.tripPointLocation.place ??
+                  'New Point of Trip')),
           actions: [
             IconButton(
               icon: Icon(_isEditing ? Icons.check : Icons.edit),
               onPressed: () {
-                if (_isEditing == true) Navigator.of(context).pop();
-                setState(() {
-                  _isEditing = !_isEditing;
-                });
+                if (_isEditing) {
+                  _onSubmit();
+                } else {
+                  setState(() {
+                    _isEditing = true;
+                  });
+                }
               },
             ),
           ],
@@ -356,9 +384,23 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
   }
 
   Future<void> _onSubmit() async {
-    if (!_formKey.currentState!.validate()) {
-      setState(() => _autovalidateMode = AutovalidateMode.always);
+    if (!_formKey.currentState!.validate() ||
+        _selectedStartDate == null ||
+        _tripPointLocation == null) {
+      setState(() {
+        _autovalidateMode = AutovalidateMode.always;
+      });
       return;
     }
+
+    final tripPoint = TripPoint(
+      tripPointLocation: _tripPointLocation!,
+      startDate: _selectedStartDate!,
+      endDate: _selectedEndDate,
+      notes:
+          _notesTextController.text.isEmpty ? null : _notesTextController.text,
+    );
+
+    Navigator.of(context).pop(tripPoint);
   }
 }
