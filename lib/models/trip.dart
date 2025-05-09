@@ -19,7 +19,8 @@ class Trip {
   int get completedChecklistItems =>
       checklist.where((item) => item.isChecked).length;
   int get totalChecklistItems => checklist.length;
-  DateTime get startDate => tripPoints.first.startDate;
+  DateTime? get startDate =>
+      tripPoints.isNotEmpty ? tripPoints.first.startDate : null;
   DateTime? get endDate => tripPoints.last.endDate;
   void archiveTripToggle() {
     archived = !archived;
@@ -28,5 +29,4 @@ class Trip {
   void updateTitle(String newTitle) {
     title = newTitle;
   }
-  
 }

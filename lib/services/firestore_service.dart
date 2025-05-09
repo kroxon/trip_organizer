@@ -1,89 +1,159 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:trip_organizer/models/trip.dart';
 import 'package:trip_organizer/models/checklist_item.dart';
 import 'package:trip_organizer/models/trip_point.dart';
 
 class FirestoreService {
-  final CollectionReference tripsCollection =
-      FirebaseFirestore.instance.collection('trips');
+  final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
   final BuildContext context;
 
   FirestoreService(this.context);
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
+  CollectionReference get _tripsCollection {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      throw Exception('No authenticated user');
+    }
+    return _firestore.collection('users').doc(userId).collection('trips');
   }
 
   Future<String?> addTrip(Trip trip) async {
     try {
-      final docRef = await tripsCollection.add({
+      final tripDoc = await _tripsCollection.add({
         'title': trip.title,
-        'checklist': trip.checklist.map((item) => _checklistItemToMap(item)).toList(),
-        'tripPoints': trip.tripPoints.map((point) => _tripPointToMap(point)).toList(),
         'archived': trip.archived,
       });
-      return docRef.id;
+
+      final checklistCollection = tripDoc.collection('checklist');
+      for (var item in trip.checklist) {
+        await checklistCollection.add(_checklistItemToMap(item));
+      }
+
+      final tripPointsCollection = tripDoc.collection('tripPoints');
+      for (var point in trip.tripPoints) {
+        await tripPointsCollection.add(_tripPointToMap(point));
+      }
+
+      return tripDoc.id;
     } catch (e) {
-      _showError('Failed to add trip: $e');
+      print('Error adding trip: $e');
       return null;
     }
   }
 
-  Future<bool> deleteTrip(String tripId) async {
+  Future<void> updateTrip(String tripId, Trip updatedTrip) async {
     try {
-      await tripsCollection.doc(tripId).delete();
-      return true;
+      final tripDoc = _tripsCollection.doc(tripId);
+      
+      await tripDoc.update({
+        'title': updatedTrip.title,
+        'archived': updatedTrip.archived,
+      });
+
+      final checklistCollection = tripDoc.collection('checklist');
+      final checklistSnapshot = await checklistCollection.get();
+      for (var doc in checklistSnapshot.docs) {
+        await doc.reference.delete();
+      }
+      for (var item in updatedTrip.checklist) {
+        await checklistCollection.add(_checklistItemToMap(item));
+      }
+
+      final tripPointsCollection = tripDoc.collection('tripPoints');
+      final tripPointsSnapshot = await tripPointsCollection.get();
+      for (var doc in tripPointsSnapshot.docs) {
+        await doc.reference.delete();
+      }
+      for (var point in updatedTrip.tripPoints) {
+        await tripPointsCollection.add(_tripPointToMap(point));
+      }
     } catch (e) {
-      _showError('Failed to delete trip: $e');
-      return false;
+      print('Error updating trip $tripId: $e');
     }
   }
 
-  Future<bool> updateTrip(String tripId, Trip updatedTrip) async {
+  Future<void> deleteTrip(String tripId) async {
     try {
-      await tripsCollection.doc(tripId).update({
-        'title': updatedTrip.title,
-        'checklist': updatedTrip.checklist.map((item) => _checklistItemToMap(item)).toList(),
-        'tripPoints': updatedTrip.tripPoints.map((point) => _tripPointToMap(point)).toList(),
-        'archived': updatedTrip.archived,
-      });
-      return true;
+      final tripDoc = _tripsCollection.doc(tripId);
+      
+      final checklistSnapshot = await tripDoc.collection('checklist').get();
+      for (var doc in checklistSnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      final tripPointsSnapshot = await tripDoc.collection('tripPoints').get();
+      for (var doc in tripPointsSnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      await tripDoc.delete();
     } catch (e) {
-      _showError('Failed to update trip: $e');
-      return false;
+      print('Error deleting trip $tripId: $e');
     }
   }
 
   Future<Trip?> getTrip(String tripId) async {
     try {
-      final DocumentSnapshot doc = await tripsCollection.doc(tripId).get();
-      if (!doc.exists) {
-        _showError('Trip not found: $tripId');
+      final tripDoc = _tripsCollection.doc(tripId);
+      final tripSnapshot = await tripDoc.get();
+
+      if (!tripSnapshot.exists) {
         return null;
       }
-      return _tripFromDocument(doc);
+
+      final checklistSnapshot = await tripDoc.collection('checklist').get();
+      final checklist = checklistSnapshot.docs.map((doc) {
+        final data = doc.data();
+        return ChecklistItem(
+          name: data['name'] as String,
+          isChecked: data['isChecked'] as bool? ?? false,
+        );
+      }).toList();
+
+      final tripPointsSnapshot = await tripDoc.collection('tripPoints').get();
+      final tripPoints = tripPointsSnapshot.docs.map((doc) {
+        final data = doc.data();
+        return TripPoint(
+          tripPointLocation: TripPointLocation(
+            latitude: data['latitude'] as double,
+            longitude: data['longitude'] as double,
+            place: data['name'] as String,
+          ),
+          startDate: (data['startDate'] as Timestamp).toDate(),
+          endDate: (data['endDate'] as Timestamp?)?.toDate(),
+        );
+      }).toList();
+
+      final data = tripSnapshot.data() as Map<String, dynamic>;
+      return Trip(
+        id: tripId,
+        title: data['title'] as String,
+        checklist: checklist,
+        tripPoints: tripPoints,
+        archived: data['archived'] as bool? ?? false,
+      );
     } catch (e) {
-      _showError('Failed to get trip: $e');
+      print('Error getting trip $tripId: $e');
       return null;
     }
   }
 
   Stream<List<Trip>> getAllTrips() {
-    return tripsCollection.snapshots().map((snapshot) {
+    return _tripsCollection.snapshots().asyncMap((snapshot) async {
       try {
-        return snapshot.docs
-            .map((doc) => _tripFromDocument(doc))
-            .where((trip) => trip != null)
-            .cast<Trip>()
-            .toList();
+        final trips = <Trip>[];
+        for (var doc in snapshot.docs) {
+          final trip = await getTrip(doc.id);
+          if (trip != null) {
+            trips.add(trip);
+          }
+        }
+        return trips;
       } catch (e) {
-        _showError('Error getting all trips: $e');
+        print('Error getting all trips: $e');
         return <Trip>[];
       }
     });
@@ -96,55 +166,13 @@ class FirestoreService {
     };
   }
 
-  Map<String, dynamic>? _tripPointToMap(TripPoint point) {
-    try {
-      return {
-        'name': point.tripPointLocation.place,
-        'latitude': point.tripPointLocation.latitude,
-        'longitude': point.tripPointLocation.longitude,
-        'startDate': Timestamp.fromDate(point.startDate),
-        'endDate': point.endDate != null ? Timestamp.fromDate(point.endDate!) : null,
-      };
-    } catch (e) {
-      _showError('Error converting trip point to map: $e');
-      return null;
-    }
-  }
-
-  Trip? _tripFromDocument(DocumentSnapshot doc) {
-    try {
-      final data = doc.data() as Map<String, dynamic>?;
-      if (data == null) {
-        _showError('Document data is null for id: ${doc.id}');
-        return null;
-      }
-
-      return Trip(
-        title: data['title'] as String? ?? '',
-        checklist: (data['checklist'] as List<dynamic>?)
-                ?.map((item) => ChecklistItem(
-                      name: (item['name'] as String?) ?? '',
-                      isChecked: item['isChecked'] as bool? ?? false,
-                    ))
-                .toList() ??
-            [],
-        tripPoints: (data['tripPoints'] as List<dynamic>?)
-                ?.map((point) => TripPoint(
-                      tripPointLocation: TripPointLocation(
-                        latitude: (point['latitude'] as num?)?.toDouble() ?? 0.0,
-                        longitude: (point['longitude'] as num?)?.toDouble() ?? 0.0,
-                        place: (point['name'] as String?) ?? '',
-                      ),
-                      startDate: ((point['startDate'] as Timestamp?)?.toDate()) ?? DateTime.now(),
-                      endDate: (point['endDate'] as Timestamp?)?.toDate(),
-                    ))
-                .toList() ??
-            [],
-        archived: data['archived'] as bool? ?? false,
-      );
-    } catch (e) {
-      _showError('Failed to parse trip document ${doc.id}: $e');
-      return null;
-    }
+  Map<String, dynamic> _tripPointToMap(TripPoint point) {
+    return {
+      'name': point.tripPointLocation.place,
+      'latitude': point.tripPointLocation.latitude,
+      'longitude': point.tripPointLocation.longitude,
+      'startDate': Timestamp.fromDate(point.startDate),
+      'endDate': point.endDate != null ? Timestamp.fromDate(point.endDate!) : null,
+    };
   }
 }

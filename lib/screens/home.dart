@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:trip_organizer/data/trips.dart';
 import 'package:trip_organizer/models/trip.dart';
 import 'package:trip_organizer/screens/trip.dart';
 import 'package:trip_organizer/services/firestore_service.dart';
 import 'package:trip_organizer/widgets/floating_action_btn.dart';
 import 'package:trip_organizer/widgets/main_drawer.dart';
-import 'package:trip_organizer/widgets/trip_card.dart';
+import 'package:trip_organizer/widgets/trips_list_builder.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +17,14 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late final FirestoreService firestoreService;
+
+  @override
+  void initState() {
+    super.initState();
+    firestoreService = FirestoreService(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,27 +34,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       drawer: MainDrawer(),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Center(
-        child: ListView.builder(
-          itemCount: sampleTrips.length,
-          itemBuilder: (ctx, index) {
-            final trip = sampleTrips[index];
-            return TripCard(
-              trip: trip,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TripScreen(
-                      trip: trip,
-                      isNewTrip: false,
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-        ),
+      body: TripListBuilder(
+        firestoreService: firestoreService,
       ),
       floatingActionButton: CustomFloatingActionButton(
         label: 'New Travel',
@@ -69,7 +57,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
 
           if (result != null) {
-            final firestoreService = FirestoreService(context);
             await firestoreService.addTrip(result);
           }
         },

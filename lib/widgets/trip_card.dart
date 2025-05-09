@@ -51,27 +51,15 @@ class TripCard extends StatelessWidget {
                         child: Column(
                           children: [
                             const SizedBox(height: 24.0),
-                            Row(
-                              children: [
-                                Icon(Icons.calendar_today_outlined,
-                                    color: colorScheme.primary, size: 16.0),
-                                const SizedBox(width: 4.0),
-                                Flexible(
-                                  child: Text(
-                                    formatterDate(trip.startDate),
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: colorScheme.onSurfaceVariant),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (trip.endDate != null) ...[
-                                  const SizedBox(width: 8.0),
+                            if (trip.tripPoints.isNotEmpty)
+                              Row(
+                                children: [
                                   Icon(Icons.calendar_today_outlined,
                                       color: colorScheme.primary, size: 16.0),
                                   const SizedBox(width: 4.0),
                                   Flexible(
                                     child: Text(
-                                      formatterDate(trip.endDate!),
+                                      formatterDate(trip.startDate!),
                                       style: theme.textTheme.bodyMedium
                                           ?.copyWith(
                                               color:
@@ -79,9 +67,24 @@ class TripCard extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
+                                  if (trip.endDate != null) ...[
+                                    const SizedBox(width: 8.0),
+                                    Icon(Icons.calendar_today_outlined,
+                                        color: colorScheme.primary, size: 16.0),
+                                    const SizedBox(width: 4.0),
+                                    Flexible(
+                                      child: Text(
+                                        formatterDate(trip.endDate!),
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                                color: colorScheme
+                                                    .onSurfaceVariant),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
                                 ],
-                              ],
-                            ),
+                              ),
                             const SizedBox(height: 16.0),
                             Row(
                               children: [
@@ -111,10 +114,12 @@ class TripCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: WeatherContainer(tripPoint: trip.tripPoints.first),
-                    )
+                    if (trip.tripPoints.isNotEmpty)
+                      Expanded(
+                        flex: 1,
+                        child:
+                            WeatherContainer(tripPoint: trip.tripPoints.first),
+                      )
                   ],
                 ),
               ),
