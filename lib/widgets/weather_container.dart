@@ -77,6 +77,7 @@ class _WeatherContainerState extends State<WeatherContainer> {
       setState(() {
         error = 'Error: $e';
         isLoading = false;
+        print('Error: $error');
       });
     }
   }
@@ -85,9 +86,13 @@ class _WeatherContainerState extends State<WeatherContainer> {
     final now = DateTime.now();
     final tomorrow = DateTime(now.year, now.month, now.day + 1);
 
-    if (date.year == now.year && date.month == now.month && date.day == now.day) {
+    if (date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day) {
       return 'Today';
-    } else if (date.year == tomorrow.year && date.month == tomorrow.month && date.day == tomorrow.day) {
+    } else if (date.year == tomorrow.year &&
+        date.month == tomorrow.month &&
+        date.day == tomorrow.day) {
       return 'Tomorrow';
     } else {
       return DateFormat('dd.MM.yyyy').format(date);
@@ -100,57 +105,59 @@ class _WeatherContainerState extends State<WeatherContainer> {
       padding: const EdgeInsets.all(8.0),
       width: 120,
       decoration: BoxDecoration(
-      color: Colors.white,
-      
-      //       gradient: const LinearGradient(
-      //   colors: [
-      //   Color.fromARGB(255, 209, 228, 240), // jasny niebieski
-      //   Color.fromARGB(255, 210, 216, 89),
-      //   ],
-      //   begin: Alignment.topLeft,
-      //   end: Alignment.bottomRight,
-      // ),
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(
-        color: const Color.fromARGB(255, 129, 88, 88),
-        width: 1,
-      ),
+        color: Colors.white,
+
+        //       gradient: const LinearGradient(
+        //   colors: [
+        //   Color.fromARGB(255, 209, 228, 240), // jasny niebieski
+        //   Color.fromARGB(255, 210, 216, 89),
+        //   ],
+        //   begin: Alignment.topLeft,
+        //   end: Alignment.bottomRight,
+        // ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color.fromARGB(255, 129, 88, 88),
+          width: 1,
+        ),
       ),
       child: isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : error != null
-          ? Center(child: Text(error!))
-          : Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-            Image.network(
-              'https://openweathermap.org/img/wn/${weatherData!.details.first.icon}@2x.png',
-              width: 64,
-              height: 64,
-              errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.wb_sunny_outlined,
-              size: 64,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${weatherData!.temperature.currentTemperature.round()}°C',
-              style:
-                Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _getDisplayDate(tripPoint.startDate),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color:
-                  Theme.of(context).colorScheme.onSurfaceVariant,
+          ? const Center(child: CircularProgressIndicator())
+          : error != null
+              ? Center(
+                  child: Text(error!,
+                      maxLines: 4, overflow: TextOverflow.ellipsis))
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.network(
+                      'https://openweathermap.org/img/wn/${weatherData!.details.first.icon}@2x.png',
+                      width: 64,
+                      height: 64,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.wb_sunny_outlined,
+                        size: 64,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${weatherData!.temperature.currentTemperature.round()}°C',
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _getDisplayDate(tripPoint.startDate),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
                 ),
-            ),
-            ],
-          ),
     );
   }
 }

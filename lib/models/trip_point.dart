@@ -24,9 +24,6 @@ class TripPoint {
   final DateTime? endDate;
   final List<String>? ticketUrls;
   final String? notes;
-  final String? googleMapsUrl;
-  final List<String>? links;
-  final String? weather;
 
   TripPoint({
     required this.tripPointLocation,
@@ -34,9 +31,6 @@ class TripPoint {
     this.endDate,
     this.ticketUrls,
     this.notes,
-    this.googleMapsUrl,
-    this.links,
-    this.weather,
   });
 
   String get formattedStartDate {

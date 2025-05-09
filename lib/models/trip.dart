@@ -2,16 +2,14 @@ import 'package:trip_organizer/models/checklist_item.dart';
 import 'package:trip_organizer/models/trip_point.dart';
 
 class Trip {
-  final String title;
+  String title;
   final List<ChecklistItem> checklist;
-  final String? weather;
   final List<TripPoint> tripPoints;
   bool archived = false;
 
   Trip({
     required this.title,
     required this.checklist,
-    this.weather,
     required this.tripPoints,
   });
 
@@ -23,5 +21,9 @@ class Trip {
   DateTime? get endDate => tripPoints.last.endDate;
   void archiveTripToggle() {
     archived = !archived;
+  }
+
+  void updateTitle(String newTitle) {
+    title = newTitle;
   }
 }

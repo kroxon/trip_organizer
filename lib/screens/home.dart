@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_organizer/data/trips.dart';
+import 'package:trip_organizer/models/trip.dart';
 import 'package:trip_organizer/screens/trip.dart';
 import 'package:trip_organizer/widgets/floating_action_btn.dart';
 import 'package:trip_organizer/widgets/main_drawer.dart';
@@ -19,8 +20,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Your Travels'), actions: [
-        ],
+      appBar: AppBar(
+        title: const Text('Your Travels'),
+        actions: [],
       ),
       drawer: MainDrawer(),
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -48,13 +50,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       floatingActionButton: CustomFloatingActionButton(
         label: 'New Travel',
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          Trip _newTrip = Trip(
+            title: 'New Trip',
+            tripPoints: [],
+            checklist: [],
+          );
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const TripScreen(isEditing: true),
+              builder: (context) => TripScreen(
+                isEditing: true,
+                trip: _newTrip,
+              ),
             ),
           );
+          if (result is Trip) {
+            _newTrip = result;
+          }
         },
       ),
     );
