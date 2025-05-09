@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_organizer/data/trips.dart';
 import 'package:trip_organizer/models/trip.dart';
 import 'package:trip_organizer/screens/trip.dart';
+import 'package:trip_organizer/services/firestore_service.dart';
 import 'package:trip_organizer/widgets/floating_action_btn.dart';
 import 'package:trip_organizer/widgets/main_drawer.dart';
 import 'package:trip_organizer/widgets/trip_card.dart';
@@ -39,7 +40,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   MaterialPageRoute(
                     builder: (context) => TripScreen(
                       trip: trip,
-                      isEditing: false,
+                      isNewTrip: false,
                     ),
                   ),
                 );
@@ -51,22 +52,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: CustomFloatingActionButton(
         label: 'New Travel',
         onPressed: () async {
-          Trip _newTrip = Trip(
+          Trip newTrip = Trip(
             title: 'New Trip',
             tripPoints: [],
             checklist: [],
           );
-          final result = await Navigator.push(
+
+          final result = await Navigator.push<Trip>(
             context,
             MaterialPageRoute(
               builder: (context) => TripScreen(
-                isEditing: true,
-                trip: _newTrip,
+                isNewTrip: true,
+                trip: newTrip,
               ),
             ),
           );
-          if (result is Trip) {
-            _newTrip = result;
+
+          if (result != null) {
+            final firestoreService = FirestoreService(context);
+            await firestoreService.addTrip(result);
           }
         },
       ),

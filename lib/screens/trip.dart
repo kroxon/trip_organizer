@@ -1,17 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:trip_organizer/models/checklist_item.dart';
 import 'package:trip_organizer/models/trip.dart';
 import 'package:trip_organizer/screens/point_of_trip.dart';
+import 'package:trip_organizer/services/firestore_service.dart';
 import 'package:trip_organizer/widgets/check_list_dialog.dart';
 import 'package:trip_organizer/widgets/floating_action_btn.dart';
 import 'package:trip_organizer/widgets/tickets_card.dart';
 import 'package:trip_organizer/widgets/trip_point_card.dart';
 
 class TripScreen extends StatefulWidget {
-  const TripScreen({super.key, this.trip, required this.isEditing});
+  const TripScreen({super.key, this.trip, required this.isNewTrip});
 
   final Trip? trip;
-  final bool isEditing;
+  final bool isNewTrip;
 
   @override
   State<TripScreen> createState() => _TripScreenState();
@@ -21,6 +24,7 @@ class _TripScreenState extends State<TripScreen> {
   Trip? trip;
   late bool isEditing;
   late TextEditingController _titleController;
+  String? _originalTitle;
 
   void _showChecklistDialog(BuildContext context) async {
     if (trip == null) return;
@@ -52,8 +56,9 @@ class _TripScreenState extends State<TripScreen> {
   void initState() {
     super.initState();
     trip = widget.trip;
-    isEditing = widget.isEditing;
-    _titleController = TextEditingController(text: trip?.title);
+    isEditing = widget.isNewTrip;
+    _originalTitle = trip?.title;
+    _titleController = TextEditingController(text: _originalTitle);
   }
 
   @override
@@ -62,13 +67,20 @@ class _TripScreenState extends State<TripScreen> {
     super.dispose();
   }
 
-  void _onSubmit() {
+  void _onSubmit() async {
     if (_titleController.text.isNotEmpty) {
       setState(() {
-        trip!.title = _titleController.text;
+        trip!.updateTitle(_titleController.text);
+        _originalTitle = _titleController.text;
         isEditing = false;
       });
-      Navigator.pop(context, trip);
+      if (!widget.isNewTrip) {
+        final firestoreService = FirestoreService(context);
+        firestoreService.updateTrip(trip!.id!, trip!);
+        Navigator.pop(context);
+      } else {
+        Navigator.pop(context, trip);
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -82,14 +94,18 @@ class _TripScreenState extends State<TripScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text(trip!.title),
         actions: [
           if (isEditing)
             IconButton(
               icon: const Icon(Icons.check),
-              onPressed: () {
-                _onSubmit;
-              },
+              onPressed: _onSubmit,
             )
           else
             IconButton(
