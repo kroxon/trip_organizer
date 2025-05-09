@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:trip_organizer/models/trip.dart';
+import 'package:trip_organizer/models/trip_point.dart';
 import 'package:trip_organizer/widgets/weather_container.dart';
 
 class TripCard extends StatelessWidget {
@@ -13,10 +14,17 @@ class TripCard extends StatelessWidget {
   final Trip trip;
   final void Function()? onTap;
 
+  TripPoint? _getEarliestTripPoint(Trip trip) {
+    if (trip.tripPoints.isEmpty) return null;
+    return trip.tripPoints.reduce((a, b) =>
+        a.startDate.isBefore(b.startDate) ? a : b);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final earliestPoint = _getEarliestTripPoint(trip);
 
     String formatterDate(DateTime date) {
       return DateFormat('dd.MM.yyyy').format(date);
@@ -51,7 +59,7 @@ class TripCard extends StatelessWidget {
                         child: Column(
                           children: [
                             const SizedBox(height: 24.0),
-                            if (trip.tripPoints.isNotEmpty)
+                            if (earliestPoint != null)
                               Row(
                                 children: [
                                   Icon(Icons.calendar_today_outlined,
@@ -59,7 +67,7 @@ class TripCard extends StatelessWidget {
                                   const SizedBox(width: 4.0),
                                   Flexible(
                                     child: Text(
-                                      formatterDate(trip.startDate!),
+                                      formatterDate(earliestPoint.startDate),
                                       style: theme.textTheme.bodyMedium
                                           ?.copyWith(
                                               color:
@@ -67,14 +75,14 @@ class TripCard extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  if (trip.endDate != null) ...[
+                                  if (earliestPoint.endDate != null) ...[
                                     const SizedBox(width: 8.0),
                                     Icon(Icons.calendar_today_outlined,
                                         color: colorScheme.primary, size: 16.0),
                                     const SizedBox(width: 4.0),
                                     Flexible(
                                       child: Text(
-                                        formatterDate(trip.endDate!),
+                                        formatterDate(earliestPoint.endDate!),
                                         style: theme.textTheme.bodyMedium
                                             ?.copyWith(
                                                 color: colorScheme
@@ -114,11 +122,10 @@ class TripCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (trip.tripPoints.isNotEmpty)
+                    if (earliestPoint != null)
                       Expanded(
                         flex: 1,
-                        child:
-                            WeatherContainer(tripPoint: trip.tripPoints.first),
+                        child: WeatherContainer(tripPoint: earliestPoint),
                       )
                   ],
                 ),

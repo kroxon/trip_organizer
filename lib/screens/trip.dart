@@ -22,7 +22,6 @@ class _TripScreenState extends State<TripScreen> {
   Trip? trip;
   late bool isEditing;
   late TextEditingController _titleController;
-  String? _originalTitle;
 
   void _showChecklistDialog(BuildContext context) async {
     if (trip == null) return;
@@ -55,8 +54,8 @@ class _TripScreenState extends State<TripScreen> {
     super.initState();
     trip = widget.trip;
     isEditing = widget.isNewTrip;
-    _originalTitle = trip?.title;
-    _titleController = TextEditingController(text: _originalTitle);
+    _titleController =
+        TextEditingController(text: !isEditing ? trip!.title : '');
   }
 
   @override
@@ -69,20 +68,14 @@ class _TripScreenState extends State<TripScreen> {
     if (_titleController.text.isNotEmpty) {
       setState(() {
         trip!.updateTitle(_titleController.text);
-        _originalTitle = _titleController.text;
         isEditing = false;
       });
-      if (!widget.isNewTrip) {
-        final firestoreService = FirestoreService(context);
-        firestoreService.updateTrip(trip!.id!, trip!);
-        Navigator.pop(context);
-      } else {
-        Navigator.pop(context, trip);
-      }
+      final firestoreService = FirestoreService(context);
+      firestoreService.updateTrip(trip!.id!, trip!);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a title for the trip.'),
+          content: Text('Please enter a title for the travel.'),
         ),
       );
     }
@@ -215,7 +208,9 @@ class _TripScreenState extends State<TripScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: trip!.tripPoints.length,
                       itemBuilder: (ctx, index) {
-                        final tripPoint = trip!.tripPoints[index];
+                        final sortedPoints = List.of(trip!.tripPoints)
+                          ..sort((a, b) => a.startDate.compareTo(b.startDate));
+                        final tripPoint = sortedPoints[index];
                         return TripPointCard(
                           tripPoint: tripPoint,
                           onTap: () {
@@ -223,6 +218,7 @@ class _TripScreenState extends State<TripScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PointOfTripScreen(
+                                  trip: trip,
                                   tripPoint: tripPoint,
                                   isEditing: false,
                                 ),
@@ -248,7 +244,10 @@ class _TripScreenState extends State<TripScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const PointOfTripScreen(isEditing: true),
+              builder: (context) => PointOfTripScreen(
+                isEditing: true,
+                trip: trip,
+              ),
             ),
           );
         },

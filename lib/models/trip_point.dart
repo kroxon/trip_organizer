@@ -19,19 +19,19 @@ class TripPointLocation {
 }
 
 class TripPoint {
-  final TripPointLocation tripPointLocation;
-  final DateTime startDate;
-  final DateTime? endDate;
-  final List<String>? ticketUrls;
-  final String? notes;
-
   TripPoint({
+    this.id,
     required this.tripPointLocation,
     required this.startDate,
     this.endDate,
-    this.ticketUrls,
     this.notes,
   });
+
+  String? id;
+  final TripPointLocation tripPointLocation;
+  final DateTime startDate;
+  final DateTime? endDate;
+  final String? notes;
 
   String get formattedStartDate {
     return '${startDate.day}.${startDate.month}.${startDate.year}';

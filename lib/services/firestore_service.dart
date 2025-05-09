@@ -22,22 +22,32 @@ class FirestoreService {
 
   Future<String?> addTrip(Trip trip) async {
     try {
-      final tripDoc = await _tripsCollection.add({
-        'title': trip.title,
-        'archived': trip.archived,
+      String? tripId;
+
+      await _firestore.runTransaction((transaction) async {
+        // Create main trip document
+        final tripDoc = _tripsCollection.doc();
+        tripId = tripDoc.id;
+
+        transaction.set(tripDoc, {
+          'title': trip.title,
+          'archived': trip.archived,
+        });
+
+        // Add checklist items
+        for (var item in trip.checklist) {
+          final checklistDoc = tripDoc.collection('checklist').doc();
+          transaction.set(checklistDoc, _checklistItemToMap(item));
+        }
+
+        // Add trip points
+        for (var point in trip.tripPoints) {
+          final tripPointDoc = tripDoc.collection('tripPoints').doc();
+          transaction.set(tripPointDoc, _tripPointToMap(point));
+        }
       });
 
-      final checklistCollection = tripDoc.collection('checklist');
-      for (var item in trip.checklist) {
-        await checklistCollection.add(_checklistItemToMap(item));
-      }
-
-      final tripPointsCollection = tripDoc.collection('tripPoints');
-      for (var point in trip.tripPoints) {
-        await tripPointsCollection.add(_tripPointToMap(point));
-      }
-
-      return tripDoc.id;
+      return tripId;
     } catch (e) {
       print('Error adding trip: $e');
       return null;
@@ -47,7 +57,7 @@ class FirestoreService {
   Future<void> updateTrip(String tripId, Trip updatedTrip) async {
     try {
       final tripDoc = _tripsCollection.doc(tripId);
-      
+
       await tripDoc.update({
         'title': updatedTrip.title,
         'archived': updatedTrip.archived,
@@ -78,7 +88,7 @@ class FirestoreService {
   Future<void> deleteTrip(String tripId) async {
     try {
       final tripDoc = _tripsCollection.doc(tripId);
-      
+
       final checklistSnapshot = await tripDoc.collection('checklist').get();
       for (var doc in checklistSnapshot.docs) {
         await doc.reference.delete();
@@ -101,9 +111,11 @@ class FirestoreService {
       final tripSnapshot = await tripDoc.get();
 
       if (!tripSnapshot.exists) {
+        print('Trip document does not exist: $tripId');
         return null;
       }
 
+      print('Fetching checklist for trip: $tripId');
       final checklistSnapshot = await tripDoc.collection('checklist').get();
       final checklist = checklistSnapshot.docs.map((doc) {
         final data = doc.data();
@@ -113,10 +125,16 @@ class FirestoreService {
         );
       }).toList();
 
+      print('Fetching trip points for trip: $tripId');
       final tripPointsSnapshot = await tripDoc.collection('tripPoints').get();
+      print('Found ${tripPointsSnapshot.docs.length} trip points');
+
       final tripPoints = tripPointsSnapshot.docs.map((doc) {
         final data = doc.data();
+        print('Trip point data: $data'); // Debug log
+
         return TripPoint(
+          id: doc.id, // Add document ID
           tripPointLocation: TripPointLocation(
             latitude: data['latitude'] as double,
             longitude: data['longitude'] as double,
@@ -124,10 +142,13 @@ class FirestoreService {
           ),
           startDate: (data['startDate'] as Timestamp).toDate(),
           endDate: (data['endDate'] as Timestamp?)?.toDate(),
+          notes: data['notes'] as String?, // Add notes if you have them
         );
       }).toList();
 
       final data = tripSnapshot.data() as Map<String, dynamic>;
+      print('Creating Trip object with ${tripPoints.length} points');
+
       return Trip(
         id: tripId,
         title: data['title'] as String,
@@ -135,8 +156,9 @@ class FirestoreService {
         tripPoints: tripPoints,
         archived: data['archived'] as bool? ?? false,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Error getting trip $tripId: $e');
+      print('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -151,12 +173,59 @@ class FirestoreService {
             trips.add(trip);
           }
         }
+        trips.sort((a, b) {
+          if (a.startDate == null && b.startDate == null) return 0;
+          if (a.startDate == null) return 1;
+          if (b.startDate == null) return -1;
+          return a.startDate!.compareTo(b.startDate!);
+        });
         return trips;
       } catch (e) {
         print('Error getting all trips: $e');
         return <Trip>[];
       }
     });
+  }
+
+  Future<String?> addTripPoint(String tripId, TripPoint tripPoint) async {
+    try {
+      if (tripId.isEmpty) {
+        print('Error: tripId is empty');
+        return null;
+      }
+      print('Adding trip point to trip: $tripId');
+      final tripPointsCollection =
+          _tripsCollection.doc(tripId).collection('tripPoints');
+      final docRef = await tripPointsCollection.add(_tripPointToMap(tripPoint));
+      return docRef.id;
+    } catch (e) {
+      print('Error adding trip point: $e');
+      return null;
+    }
+  }
+
+  Future<void> updateTripPoint(
+      String tripId, String pointId, TripPoint updatedPoint) async {
+    try {
+      final pointRef =
+          _tripsCollection.doc(tripId).collection('tripPoints').doc(pointId);
+
+      await pointRef.update(_tripPointToMap(updatedPoint));
+    } catch (e) {
+      print('Error updating trip point: $e');
+    }
+  }
+
+  Future<void> deleteTripPoint(String tripId, String pointId) async {
+    try {
+      await _tripsCollection
+          .doc(tripId)
+          .collection('tripPoints')
+          .doc(pointId)
+          .delete();
+    } catch (e) {
+      print('Error deleting trip point: $e');
+    }
   }
 
   Map<String, dynamic> _checklistItemToMap(ChecklistItem item) {
@@ -172,7 +241,8 @@ class FirestoreService {
       'latitude': point.tripPointLocation.latitude,
       'longitude': point.tripPointLocation.longitude,
       'startDate': Timestamp.fromDate(point.startDate),
-      'endDate': point.endDate != null ? Timestamp.fromDate(point.endDate!) : null,
+      'endDate':
+          point.endDate != null ? Timestamp.fromDate(point.endDate!) : null,
     };
   }
 }

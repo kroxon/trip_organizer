@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
+import 'package:trip_organizer/models/trip.dart';
 import 'package:trip_organizer/models/trip_point.dart';
+import 'package:trip_organizer/services/firestore_service.dart';
 import 'package:trip_organizer/widgets/map_image.dart';
 import 'package:trip_organizer/widgets/weather_container.dart';
 
 class PointOfTripScreen extends StatefulWidget {
-  const PointOfTripScreen({super.key, this.tripPoint, required this.isEditing});
+  PointOfTripScreen(
+      {super.key, this.tripPoint, required this.isEditing, required this.trip});
 
   final TripPoint? tripPoint;
+  final Trip? trip;
   final bool isEditing;
 
   @override
@@ -19,6 +23,7 @@ class PointOfTripScreen extends StatefulWidget {
 }
 
 class _PointOfTripScreenState extends State<PointOfTripScreen> {
+  late FirestoreService firestoreService;
   late bool _isEditing;
   final _destinationTextController = TextEditingController();
   final _notesTextController = TextEditingController();
@@ -76,6 +81,7 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
   @override
   void initState() {
     super.initState();
+    firestoreService = FirestoreService(context);
     _isEditing = widget.isEditing;
 
     if (widget.tripPoint != null) {
@@ -260,13 +266,10 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                   _destinationTextController.text = prediction.description!,
               minInputLength: 3,
             ),
-
             const SizedBox(height: 20),
             if (_tripPointLocation != null)
               MapImage(location: _tripPointLocation!),
-
             const SizedBox(height: 20),
-
             Row(
               children: [
                 Column(
@@ -388,18 +391,13 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
           title: Text(_isEditing
               ? (_tripPointLocation?.place ?? 'New Point of Trip')
               : (widget.tripPoint?.tripPointLocation.place ??
-                  'New Point of Trip')),
-          actions: [
+                  'New Point of Trip')),          actions: [
             IconButton(
               icon: Icon(_isEditing ? Icons.check : Icons.edit),
-              onPressed: () {
-                if (_isEditing) {
-                  _onSubmit();
-                } else {
-                  setState(() {
-                    _isEditing = true;
-                  });
-                }
+              onPressed: _isEditing ? () => _onSubmit() : () {
+                setState(() {
+                  _isEditing = true;
+                });
               },
             ),
           ],
@@ -412,12 +410,14 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
         _selectedStartDate == null ||
         _tripPointLocation == null) {
       setState(() {
+        print('Form is not valid');
         _autovalidateMode = AutovalidateMode.always;
       });
       return;
     }
 
-    if (_selectedEndDate != null && _selectedEndDate!.isBefore(_selectedStartDate!)) {
+    if (_selectedEndDate != null &&
+        _selectedEndDate!.isBefore(_selectedStartDate!)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('End date must be after start date'),
@@ -434,6 +434,32 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
       notes:
           _notesTextController.text.isEmpty ? null : _notesTextController.text,
     );
+
+    if (widget.tripPoint != null) {
+      tripPoint.id = widget.tripPoint!.id;
+      await firestoreService.updateTripPoint(
+        widget.trip!.id!,
+        tripPoint.id!,
+        tripPoint,
+      );
+    } else {
+      final pointId = await firestoreService.addTripPoint(
+        widget.trip!.id!,
+        tripPoint,
+      );
+      print('Point ID: $pointId');
+
+      if (pointId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to add trip point'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+      tripPoint.id = pointId;
+    }
 
     Navigator.of(context).pop(tripPoint);
   }

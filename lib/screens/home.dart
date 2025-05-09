@@ -45,8 +45,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             tripPoints: [],
             checklist: [],
           );
-
-          final result = await Navigator.push<Trip>(
+          await firestoreService.addTrip(newTrip);
+          await Navigator.push<Trip>(
             context,
             MaterialPageRoute(
               builder: (context) => TripScreen(
@@ -55,10 +55,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           );
-
-          if (result != null) {
-            await firestoreService.addTrip(result);
-          }
         },
       ),
     );

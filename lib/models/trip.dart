@@ -2,11 +2,6 @@ import 'package:trip_organizer/models/checklist_item.dart';
 import 'package:trip_organizer/models/trip_point.dart';
 
 class Trip {
-  String? id;
-  String title;
-  final List<ChecklistItem> checklist;
-  final List<TripPoint> tripPoints;
-  bool archived = false;
   Trip({
     this.id,
     required this.title,
@@ -14,6 +9,12 @@ class Trip {
     required this.tripPoints,
     this.archived = false,
   });
+
+  String? id;
+  String title;
+  final List<ChecklistItem> checklist;
+  final List<TripPoint> tripPoints;
+  bool archived = false;
 
   bool get isChecklistComplete => checklist.every((item) => item.isChecked);
   int get completedChecklistItems =>

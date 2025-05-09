@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      // Base user access
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      match /trips/{tripId} {
+        // Trip document rules
+        allow create: if request.auth != null && request.auth.uid == userId;
+        allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+        
+        // Checklist rules - matches your checklistCollection usage
+        match /checklist/{itemId} {
+          allow create, read, update, delete: if request.auth != null && request.auth.uid == userId;
+        }
+
+        // TripPoints rules - matches your tripPointsCollection usage
+        match /tripPoints/{pointId} {
+          allow create, read, update, delete: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
