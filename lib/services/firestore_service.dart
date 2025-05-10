@@ -228,6 +228,26 @@ class FirestoreService {
     }
   }
 
+  Stream<List<TripPoint>> getTripPoints(String tripId) {
+    final tripPointsCollection =
+        _tripsCollection.doc(tripId).collection('tripPoints');
+    return tripPointsCollection.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return TripPoint(
+          id: doc.id,
+          tripPointLocation: TripPointLocation(
+            latitude: data['latitude'] as double,
+            longitude: data['longitude'] as double,
+            place: data['name'] as String,
+          ),
+          startDate: (data['startDate'] as Timestamp).toDate(),
+          endDate: (data['endDate'] as Timestamp?)?.toDate(),
+        );
+      }).toList();
+    });
+  }
+
   Map<String, dynamic> _checklistItemToMap(ChecklistItem item) {
     return {
       'name': item.name,
