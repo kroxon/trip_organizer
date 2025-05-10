@@ -6,7 +6,6 @@ import 'package:trip_organizer/services/firestore_service.dart';
 import 'package:trip_organizer/widgets/check_list_dialog.dart';
 import 'package:trip_organizer/widgets/floating_action_btn.dart';
 import 'package:trip_organizer/widgets/tickets_card.dart';
-import 'package:trip_organizer/widgets/trip_point_card.dart';
 import 'package:trip_organizer/widgets/trip_points_list_builder.dart';
 
 class TripScreen extends StatefulWidget {
@@ -20,6 +19,8 @@ class TripScreen extends StatefulWidget {
 }
 
 class _TripScreenState extends State<TripScreen> {
+  late FirestoreService firestoreService;
+
   Trip? trip;
   late bool isEditing;
   late TextEditingController _titleController;
@@ -53,6 +54,7 @@ class _TripScreenState extends State<TripScreen> {
   @override
   void initState() {
     super.initState();
+    firestoreService = FirestoreService(context);
     trip = widget.trip;
     isEditing = widget.isNewTrip;
     _titleController =
@@ -84,20 +86,12 @@ class _TripScreenState extends State<TripScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = const Center(
-      child: CircularProgressIndicator(),
-    );
-
-    if (trip!.tripPoints.isEmpty) {
-      content = const Center(child: Text('No points added yet.'));
-    }
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(trip);
           },
         ),
         title: Text(trip!.title),
@@ -138,6 +132,8 @@ class _TripScreenState extends State<TripScreen> {
                       },
                     ),
                   ),
+                  maxLength: 50,
+                  maxLines: 1,
                 ),
               ),
             GestureDetector(
@@ -212,100 +208,10 @@ class _TripScreenState extends State<TripScreen> {
             SizedBox(
               height: 12,
             ),
-            TripPointsListBuilder(
-              tripId: trip!.id!,
-            ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            //   child: trip != null && trip!.tripPoints.isNotEmpty
-            //       ? ListView.builder(
-            //           shrinkWrap: true,
-            //           physics: const NeverScrollableScrollPhysics(),
-            //           itemCount: trip!.tripPoints.length,
-            //           itemBuilder: (ctx, index) {
-            //             final sortedPoints = List.of(trip!.tripPoints)
-            //               ..sort((a, b) => a.startDate.compareTo(b.startDate));
-            //             final tripPoint = sortedPoints[index];
-            //             return Dismissible(
-            //               key: Key(tripPoint.id!),
-            //               background: Container(
-            //                 color: Colors.red,
-            //                 alignment: Alignment.centerRight,
-            //                 padding: const EdgeInsets.only(right: 20.0),
-            //                 child:
-            //                     const Icon(Icons.delete, color: Colors.white),
-            //               ),
-            //               direction: DismissDirection.endToStart,
-            //               confirmDismiss: (direction) async {
-            //                 return await showDialog(
-            //                   context: context,
-            //                   builder: (BuildContext context) {
-            //                     return AlertDialog(
-            //                       title: const Text('Delete Point of Trip'),
-            //                       content: const Text(
-            //                           'Are you sure you want to delete this point of trip?'),
-            //                       actions: [
-            //                         TextButton(
-            //                           onPressed: () =>
-            //                               Navigator.of(context).pop(false),
-            //                           child: const Text('CANCEL'),
-            //                         ),
-            //                         TextButton(
-            //                           onPressed: () =>
-            //                               Navigator.of(context).pop(true),
-            //                           child: const Text('DELETE'),
-            //                         ),
-            //                       ],
-            //                     );
-            //                   },
-            //                 );
-            //               },
-            //               onDismissed: (direction) {
-            //                 setState(() {
-            //                   trip!.tripPoints.removeAt(index);
-            //                 });
-            //                 FirestoreService(context)
-            //                     .deleteTripPoint(trip!.id!, tripPoint.id!);
-            //                 ScaffoldMessenger.of(context).showSnackBar(
-            //                   SnackBar(
-            //                     content: Text(
-            //                         '${tripPoint.tripPointLocation.place} deleted'),
-            //                     action: SnackBarAction(
-            //                       label: 'UNDO',
-            //                       onPressed: () {
-            //                         setState(() {
-            //                           trip!.tripPoints.insert(index, tripPoint);
-            //                         });
-            //                       },
-            //                     ),
-            //                   ),
-            //                 );
-            //               },
-            //               child: TripPointCard(
-            //                 tripPoint: tripPoint,
-            //                 onTap: () {
-            //                   Navigator.push(
-            //                     context,
-            //                     MaterialPageRoute(
-            //                       builder: (context) => PointOfTripScreen(
-            //                         trip: trip,
-            //                         tripPoint: tripPoint,
-            //                         isEditing: false,
-            //                       ),
-            //                     ),
-            //                   );
-            //                 },
-            //               ),
-            //             );
-            //           },
-            //         )
-            //       : const Center(
-            //           child: Padding(
-            //             padding: EdgeInsets.all(16.0),
-            //             child: Text('No points added yet.'),
-            //           ),
-            //         ),
-            // ),
+            if (trip!.tripPoints.isNotEmpty)
+              TripPointsListBuilder(
+                trip: trip!,
+              ),
           ],
         ),
       ),

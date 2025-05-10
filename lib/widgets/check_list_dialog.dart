@@ -37,7 +37,6 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
         _items.add(ChecklistItem(name: _textController.text));
         _textController.clear();
       });
-      widget.onChecklistChanged(_items);
     }
   }
 
@@ -45,7 +44,6 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
     setState(() {
       _items.removeAt(index);
     });
-    widget.onChecklistChanged(_items);
   }
 
   @override
@@ -85,7 +83,6 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
                           setState(() {
                             _items[index].isChecked = value;
                           });
-                          widget.onChecklistChanged(_items);
                         }
                       },
                       contentPadding: EdgeInsets.zero,
@@ -147,6 +144,7 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
             ),
           ),
           onPressed: () {
+            widget.onChecklistChanged(_items); // Wywołanie tylko przy OK
             Navigator.of(context).pop(_items);
           },
         ),

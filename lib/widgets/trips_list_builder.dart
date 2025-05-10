@@ -7,8 +7,7 @@ import 'package:trip_organizer/widgets/trip_card.dart';
 class TripListBuilder extends StatefulWidget {
   const TripListBuilder({super.key, required this.firestoreService});
 
-    final FirestoreService firestoreService;
-
+  final FirestoreService firestoreService;
 
   @override
   State<TripListBuilder> createState() => _TripListBuilderState();
@@ -89,7 +88,10 @@ class _TripListBuilderState extends State<TripListBuilder> {
                         isNewTrip: false,
                       ),
                     ),
-                  );
+                  ).then((value) {
+                    setState(() {});
+                  });
+                  ;
                 },
               ),
             );

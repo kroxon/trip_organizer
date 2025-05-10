@@ -391,14 +391,17 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
           title: Text(_isEditing
               ? (_tripPointLocation?.place ?? 'New Point of Trip')
               : (widget.tripPoint?.tripPointLocation.place ??
-                  'New Point of Trip')),          actions: [
+                  'New Point of Trip')),
+          actions: [
             IconButton(
               icon: Icon(_isEditing ? Icons.check : Icons.edit),
-              onPressed: _isEditing ? () => _onSubmit() : () {
-                setState(() {
-                  _isEditing = true;
-                });
-              },
+              onPressed: _isEditing
+                  ? () => _onSubmit()
+                  : () {
+                      setState(() {
+                        _isEditing = true;
+                      });
+                    },
             ),
           ],
         ),
@@ -406,61 +409,70 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
   }
 
   Future<void> _onSubmit() async {
-    if (!_formKey.currentState!.validate() ||
-        _selectedStartDate == null ||
-        _tripPointLocation == null) {
-      setState(() {
-        print('Form is not valid');
-        _autovalidateMode = AutovalidateMode.always;
-      });
-      return;
-    }
+    try {
+      if (!_formKey.currentState!.validate() ||
+          _selectedStartDate == null ||
+          _tripPointLocation == null) {
+        setState(() {
+          print('Form is not valid');
+          _autovalidateMode = AutovalidateMode.always;
+        });
+        return;
+      }
 
-    if (_selectedEndDate != null &&
-        _selectedEndDate!.isBefore(_selectedStartDate!)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('End date must be after start date'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
-    final tripPoint = TripPoint(
-      tripPointLocation: _tripPointLocation!,
-      startDate: _selectedStartDate!,
-      endDate: _selectedEndDate,
-      notes:
-          _notesTextController.text.isEmpty ? null : _notesTextController.text,
-    );
-
-    if (widget.tripPoint != null) {
-      tripPoint.id = widget.tripPoint!.id;
-      await firestoreService.updateTripPoint(
-        widget.trip!.id!,
-        tripPoint.id!,
-        tripPoint,
-      );
-    } else {
-      final pointId = await firestoreService.addTripPoint(
-        widget.trip!.id!,
-        tripPoint,
-      );
-      print('Point ID: $pointId');
-
-      if (pointId == null) {
+      if (_selectedEndDate != null &&
+          _selectedEndDate!.isBefore(_selectedStartDate!)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to add trip point'),
+            content: Text('End date must be after start date'),
             duration: Duration(seconds: 2),
           ),
         );
         return;
       }
-      tripPoint.id = pointId;
-    }
 
-    Navigator.of(context).pop(tripPoint);
+      final tripPoint = TripPoint(
+        tripPointLocation: _tripPointLocation!,
+        startDate: _selectedStartDate!,
+        endDate: _selectedEndDate,
+        notes: _notesTextController.text.isEmpty
+            ? null
+            : _notesTextController.text,
+      );
+
+      if (widget.tripPoint != null) {
+        tripPoint.id = widget.tripPoint!.id;
+        await firestoreService.updateTripPoint(
+          widget.trip!.id!,
+          tripPoint.id!,
+          tripPoint,
+        );
+      } else {
+        final pointId = await firestoreService.addTripPoint(
+          widget.trip!.id!,
+          tripPoint,
+        );
+        print('Point ID: $pointId');
+
+        if (pointId == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to add trip point'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          return;
+        }
+        tripPoint.id = pointId;
+      }
+
+      Navigator.of(context).pop(tripPoint);
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An error occurred while saving the trip point'),
+        ),
+      );
+    }
   }
 }

@@ -173,11 +173,18 @@ class FirestoreService {
             trips.add(trip);
           }
         }
+        // sort by startDate
         trips.sort((a, b) {
-          if (a.startDate == null && b.startDate == null) return 0;
-          if (a.startDate == null) return 1;
-          if (b.startDate == null) return -1;
-          return a.startDate!.compareTo(b.startDate!);
+          if (a.tripPoints.isEmpty && b.tripPoints.isEmpty) {
+            return 0;
+          } else if (a.tripPoints.isEmpty) {
+            return 1;
+          } else if (b.tripPoints.isEmpty) {
+            return -1;
+          } else {
+            return a.tripPoints.first.startDate
+                .compareTo(b.tripPoints.first.startDate);
+          }
         });
         return trips;
       } catch (e) {
@@ -232,7 +239,7 @@ class FirestoreService {
     final tripPointsCollection =
         _tripsCollection.doc(tripId).collection('tripPoints');
     return tripPointsCollection.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
+      final tripPoints = snapshot.docs.map((doc) {
         final data = doc.data();
         return TripPoint(
           id: doc.id,
@@ -245,6 +252,9 @@ class FirestoreService {
           endDate: (data['endDate'] as Timestamp?)?.toDate(),
         );
       }).toList();
+
+      tripPoints.sort((a, b) => a.startDate.compareTo(b.startDate));
+      return tripPoints;
     });
   }
 

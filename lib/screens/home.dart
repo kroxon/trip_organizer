@@ -33,7 +33,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [],
       ),
       drawer: MainDrawer(),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: TripListBuilder(
         firestoreService: firestoreService,
       ),
@@ -46,15 +46,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             checklist: [],
           );
           await firestoreService.addTrip(newTrip);
-          await Navigator.push<Trip>(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => TripScreen(
-                isNewTrip: true,
+                isNewTrip: false,
                 trip: newTrip,
               ),
             ),
-          );
+          ).then((value) {
+            setState(() {});
+          });
         },
       ),
     );

@@ -23,6 +23,7 @@ class _WeatherContainerState extends State<WeatherContainer> {
   String? error;
   late OpenWeather _openWeather;
   late TripPoint tripPoint;
+  DateTime? targetDate;
 
   @override
   void initState() {
@@ -41,18 +42,20 @@ class _WeatherContainerState extends State<WeatherContainer> {
 
     final now = DateTime.now();
     final startDate = tripPoint.startDate;
+    
+    targetDate = startDate.isBefore(DateTime(now.year, now.month, now.day)) 
+        ? now 
+        : startDate;
 
-    if (startDate.difference(now).inDays > 5) {
+    if (targetDate!.difference(now).inDays > 5) {
       setState(() {
-        error =
-            'Weather forecast not available yet.\nCheck again ${5 - startDate.difference(now).inDays} days.';
+        error = 'Available in ${5 - targetDate!.difference(now).inDays} days.';
         isLoading = false;
       });
       return;
     }
 
-    final targetDate = startDate.isBefore(now) ? now : startDate;
-    final dayIndex = targetDate.difference(now).inDays;
+    final dayIndex = targetDate!.difference(now).inDays;
 
     try {
       final data = await _openWeather
@@ -105,8 +108,7 @@ class _WeatherContainerState extends State<WeatherContainer> {
       padding: const EdgeInsets.all(8.0),
       width: 120,
       decoration: BoxDecoration(
-        color: Colors.white,
-
+        color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(150),
         //       gradient: const LinearGradient(
         //   colors: [
         //   Color.fromARGB(255, 209, 228, 240), // jasny niebieski
@@ -117,7 +119,7 @@ class _WeatherContainerState extends State<WeatherContainer> {
         // ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color.fromARGB(255, 129, 88, 88),
+          color: Theme.of(context).colorScheme.primary,
           width: 1,
         ),
       ),
@@ -150,7 +152,7 @@ class _WeatherContainerState extends State<WeatherContainer> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      _getDisplayDate(tripPoint.startDate),
+                      _getDisplayDate(targetDate!),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,

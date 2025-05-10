@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -51,7 +52,6 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
       setState(() {
         _isAuthenticating = false;
       });
-      print('Error: $error');
     } finally {
       if (mounted) {
         setState(() {
@@ -65,18 +65,44 @@ class _AuthLoginScreenState extends State<AuthLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (_isAuthenticating)
-            const CircularProgressIndicator()
-          else
-            SignInButton(
-              Buttons.google,
-              onPressed: _signInWithGoogle,
-              text: 'Sign in with Google',
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedTextKit(
+              animatedTexts: [
+                TypewriterAnimatedText(
+                  'Trip Organizer',
+                  textStyle: TextStyle(
+                    fontSize: 48.0,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                  speed: const Duration(milliseconds: 200),
+                ),
+              ],
+              totalRepeatCount: 20,
             ),
-        ],
+            const SizedBox(height: 70),
+            if (_isAuthenticating)
+              const CircularProgressIndicator()
+            else
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SizedBox(
+                  child: SignInButton(
+                    Buttons.google,
+                    onPressed: _signInWithGoogle,
+                    text: 'Sign in with Google',
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -20,9 +20,20 @@ class Trip {
   int get completedChecklistItems =>
       checklist.where((item) => item.isChecked).length;
   int get totalChecklistItems => checklist.length;
-  DateTime? get startDate =>
-      tripPoints.isNotEmpty ? tripPoints.first.startDate : null;
-  DateTime? get endDate => tripPoints.last.endDate;
+  DateTime? get startDate {
+    if (tripPoints.isEmpty) return null;
+    return tripPoints
+        .map((point) => point.startDate)
+        .reduce((a, b) => a.isBefore(b) ? a : b);
+  }
+  DateTime? get endDate {
+    if (tripPoints.isEmpty || tripPoints.any((point) => point.endDate == null)) {
+      return null;
+    }
+    return tripPoints
+        .map((point) => point.endDate!)
+        .reduce((a, b) => a.isAfter(b) ? a : b);
+  }
   void archiveTripToggle() {
     archived = !archived;
   }

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 final darkColorScheme = ColorScheme.fromSeed(
   brightness: Brightness.dark,
   seedColor: const Color(0xFF6B4EFF),
-  primary: const Color(0xFF6B4EFF),
-  secondary: const Color(0xFF00D6B4),
-  tertiary: const Color(0xFFFF6B6B),
+  primary: const Color(0xFF9D86FF), // Jaśniejszy odcień fioletu dla lepszej widoczności w trybie ciemnym
+  secondary: const Color(0xFF4DFFD4), // Jaśniejszy odcień turkusu
+  tertiary: const Color(0xFFFF8F8F), // Jaśniejszy odcień czerwieni
   surface: const Color(0xFF1A1A2E),
   onSurfaceVariant: const Color(0xFF1A1A2E),
   error: const Color(0xFFFF4B4B),
@@ -21,9 +21,9 @@ final darkColorScheme = ColorScheme.fromSeed(
 final lightColorScheme = ColorScheme.fromSeed(
   brightness: Brightness.light,
   seedColor: const Color(0xFF6B4EFF),
-  primary: const Color(0xFF6B4EFF),
-  secondary: const Color(0xFF00D6B4),
-  tertiary: const Color(0xFFFF6B6B),
+  primary: const Color(0xFF5838E7), // Ciemniejszy odcień fioletu dla trybu jasnego
+  secondary: const Color(0xFF00B396), // Ciemniejszy odcień turkusu
+  tertiary: const Color(0xFFE64646), // Ciemniejszy odcień czerwieni
   surface: Colors.white,
   onSurfaceVariant: Colors.white,
   error: const Color(0xFFFF4B4B),
