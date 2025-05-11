@@ -33,7 +33,7 @@ class CustomFloatingActionButton extends StatelessWidget {
                 : Theme.of(context).colorScheme.primary,
           ),
           backgroundColor:
-              isDarkMode ? Theme.of(context).colorScheme.primary : Colors.white,
+              isDarkMode ? Theme.of(context).colorScheme.surfaceContainerHigh : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: isDarkMode

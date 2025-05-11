@@ -27,12 +27,14 @@ class Trip {
         .reduce((a, b) => a.isBefore(b) ? a : b);
   }
   DateTime? get endDate {
-    if (tripPoints.isEmpty || tripPoints.any((point) => point.endDate == null)) {
-      return null;
-    }
-    return tripPoints
-        .map((point) => point.endDate!)
-        .reduce((a, b) => a.isAfter(b) ? a : b);
+    if (tripPoints.isEmpty) return null;
+    final endDates = tripPoints
+        .map((point) => point.endDate)
+        .where((date) => date != null)
+        .cast<DateTime>()
+        .toList();
+    if (endDates.isEmpty) return null;
+    return endDates.reduce((a, b) => a.isAfter(b) ? a : b);
   }
   void archiveTripToggle() {
     archived = !archived;

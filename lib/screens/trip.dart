@@ -19,8 +19,6 @@ class TripScreen extends StatefulWidget {
 }
 
 class _TripScreenState extends State<TripScreen> {
-  late FirestoreService firestoreService;
-
   Trip? trip;
   late bool isEditing;
   late TextEditingController _titleController;
@@ -48,13 +46,13 @@ class _TripScreenState extends State<TripScreen> {
         trip!.checklist.clear();
         trip!.checklist.addAll(result);
       });
+      await FirestoreService(context).updateTrip(trip!.id!, trip!);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    firestoreService = FirestoreService(context);
     trip = widget.trip;
     isEditing = widget.isNewTrip;
     _titleController =
@@ -68,20 +66,21 @@ class _TripScreenState extends State<TripScreen> {
   }
 
   void _onSubmit() async {
-    if (_titleController.text.isNotEmpty) {
-      setState(() {
-        trip!.updateTitle(_titleController.text);
-        isEditing = false;
-      });
-      final firestoreService = FirestoreService(context);
-      firestoreService.updateTrip(trip!.id!, trip!);
-    } else {
+    if (_titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter a title for the travel.'),
         ),
       );
+      return;
     }
+
+    setState(() {
+      trip!.updateTitle(_titleController.text);
+      isEditing = false;
+    });
+
+    await FirestoreService(context).updateTrip(trip!.id!, trip!);
   }
 
   @override
@@ -134,6 +133,9 @@ class _TripScreenState extends State<TripScreen> {
                   ),
                   maxLength: 50,
                   maxLines: 1,
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                 ),
               ),
             GestureDetector(

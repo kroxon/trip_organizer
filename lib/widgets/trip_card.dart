@@ -16,8 +16,8 @@ class TripCard extends StatelessWidget {
 
   TripPoint? _getEarliestTripPoint(Trip trip) {
     if (trip.tripPoints.isEmpty) return null;
-    return trip.tripPoints.reduce((a, b) =>
-        a.startDate.isBefore(b.startDate) ? a : b);
+    return trip.tripPoints
+        .reduce((a, b) => a.startDate.isBefore(b.startDate) ? a : b);
   }
 
   @override
@@ -59,26 +59,33 @@ class TripCard extends StatelessWidget {
                     if (earliestPoint != null)
                       Row(
                         children: [
-                          Icon(Icons.calendar_today_outlined, size: 22.0),
-                          const SizedBox(width: 4.0),
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 22.0,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 8.0),
                           Flexible(
                             child: Text(
                               formatterDate(earliestPoint.startDate),
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant),
+                              style: theme.textTheme.bodyLarge
+                                  ?.copyWith(color: colorScheme.onSurface),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (earliestPoint.endDate != null) ...[
-                            const SizedBox(width: 8.0),
-                            Icon(Icons.calendar_today_outlined,
-                                color: colorScheme.primary, size: 16.0),
+                            const SizedBox(width: 16.0),
+                            Icon(
+                              Icons.event_available,
+                              size: 22.0,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                             const SizedBox(width: 4.0),
                             Flexible(
                               child: Text(
                                 formatterDate(earliestPoint.endDate!),
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: colorScheme.onSurfaceVariant),
+                                style: theme.textTheme.bodyLarge
+                                    ?.copyWith(color: colorScheme.onSurface),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -93,18 +100,15 @@ class TripCard extends StatelessWidget {
                                   trip.totalChecklistItems
                               ? Icons.check_circle_outline
                               : Icons.playlist_add_check_outlined,
-                          color: trip.completedChecklistItems ==
-                                  trip.totalChecklistItems
-                              ? colorScheme.secondary
-                              : colorScheme.onSurfaceVariant,
-                          size: 16.0,
+                          color: colorScheme.onSurfaceVariant,
+                          size: 24.0,
                         ),
-                        const SizedBox(width: 4.0),
+                        const SizedBox(width: 8.0),
                         Flexible(
                           child: Text(
                             '${trip.completedChecklistItems} / ${trip.totalChecklistItems} of the items collected',
-                            style: theme.textTheme.bodyMedium
-                                ?.copyWith(color: colorScheme.onSurfaceVariant),
+                            style: theme.textTheme.bodyLarge
+                                ?.copyWith(color: colorScheme.onSurface),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),

@@ -4,7 +4,7 @@ A comprehensive mobile application for planning and organizing your travels, bui
 
 ## 🚧 Project Status: Under Development 🚧
 
-This project is currently in active development. Core features are being implemented and refined.
+This project is currently under active development. The basic functions are so far adapted to Android. In the future, the application will also be running on IOs.
 
 ## Overview
 
@@ -22,9 +22,18 @@ Trip Organizer is designed to help travelers plan, organize, and manage their jo
 
 - Flutter/Dart
 - Google Maps Integration
-- Riverpod for State Management
+- Riverpod 
+- Firebase for Authentication and Cloud Firestore
+- HTTP Package for Network Requests
+- Integration with External APIs (e.g., OpenWeather for weather updates)
 
-## Getting Started
 
+## Screenshots
 
-
+![App Screenshot](assets/images/image.png)
+![App Screenshot](assets/images/image2.png)
+![App Screenshot](assets/images/image4.png)
+![App Screenshot](assets/images/image3.png)
+![App Screenshot](assets/images/image5.png)
+![App Screenshot](assets/images/image6.png)
+![App Screenshot](assets/images/image7.png)

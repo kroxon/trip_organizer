@@ -51,7 +51,10 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      title: const Text('List of things to take:'),
+      title: Text(
+        'List of things to take:',
+        style: TextStyle(color: theme.colorScheme.onSurface),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -78,6 +81,8 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
                     child: CheckboxListTile(
                       title: Text(_items[index].name),
                       value: _items[index].isChecked,
+                      activeColor: theme.colorScheme.onSurface,
+                      checkColor: theme.colorScheme.surface,
                       onChanged: (bool? value) {
                         if (value != null) {
                           setState(() {
@@ -100,18 +105,30 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
                 child: TextField(
                   controller: _textController,
                   decoration: InputDecoration(
-                    hintText: 'Add new item',
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.onSurface),
-                    ),
+                  hintText: 'Add new item',
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.onSurface),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      width: 2.0),
+                  ),
+                  ),
+                  style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.add),
+                icon: Icon(
+                  Icons.add,
+                  color: theme.colorScheme.onSurface,
+                ),
                 onPressed: _addItem,
               ),
             ],
@@ -144,7 +161,7 @@ class _ChecklistAlertDialogState extends State<ChecklistAlertDialog> {
             ),
           ),
           onPressed: () {
-            widget.onChecklistChanged(_items); // Wywołanie tylko przy OK
+            widget.onChecklistChanged(_items);
             Navigator.of(context).pop(_items);
           },
         ),

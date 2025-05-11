@@ -217,9 +217,19 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
               key: _autoCompleteKey,
               textEditingController: _destinationTextController,
               googleAPIKey: dotenv.env['YOUR_GOOGLE_API_KEY']!,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+              predictionsStyle: Theme.of(context)
+                  .textTheme
+                  .titleMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
               decoration: InputDecoration(
                 hintText: 'Enter your destination',
                 labelText: 'Destination',
+                labelStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                 prefixIcon: Icon(
                   Icons.search,
                 ),
@@ -233,11 +243,15 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                   },
                 ),
                 filled: true,
-                fillColor: Colors.white,
-                labelStyle: TextStyle(color: Colors.purple),
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                   borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ),
               validator: (value) {
@@ -248,9 +262,9 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
               },
               maxLines: 1,
               overlayContainerBuilder: (child) => Material(
-                elevation: 1.0,
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                elevation: 4.0,
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
+
                 child: child,
               ),
               onPlaceDetailsWithCoordinatesReceived: (prediction) {
@@ -276,12 +290,9 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Start date',
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                )),
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            )),
                     Row(
                       children: [
                         Column(
@@ -292,12 +303,12 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                                   ? 'Select start date'
                                   : formatter.format(_selectedStartDate!),
                               style: TextStyle(
-                                color: _selectedStartDate == null &&
-                                        _autovalidateMode ==
-                                            AutovalidateMode.always
-                                    ? Theme.of(context).colorScheme.error
-                                    : null,
-                              ),
+                                  color: _selectedStartDate == null &&
+                                          _autovalidateMode ==
+                                              AutovalidateMode.always
+                                      ? Theme.of(context).colorScheme.error
+                                      : Theme.of(context).colorScheme.onSurface,
+                                  fontSize: 18),
                             ),
                             if (_selectedStartDate == null &&
                                 _autovalidateMode == AutovalidateMode.always)
@@ -312,8 +323,10 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                         ),
                         IconButton(
                           onPressed: () => _presentDatePicker('start'),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.calendar_month,
+                            size: 28,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -321,30 +334,30 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
                   ],
                 ),
                 SizedBox(
-                  width: 20,
+                  width: 24,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('End date',
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                )),
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            )),
                     Row(
                       children: [
                         Text(
                           _selectedEndDate == null
                               ? 'Select end date'
                               : formatter.format(_selectedEndDate!),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 18),
                         ),
                         IconButton(
                           onPressed: () => _presentDatePicker('end'),
-                          icon: const Icon(
-                            Icons.calendar_month,
-                          ),
+                          icon: Icon(Icons.calendar_month,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              size: 28),
                         ),
                       ],
                     ),
@@ -355,25 +368,32 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
             SizedBox(
               height: 20,
             ),
-            TextFormField(
+            TextField(
               controller: _notesTextController,
               maxLines: 5,
               minLines: 5,
               textAlignVertical: TextAlignVertical.top,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
               decoration: InputDecoration(
+                labelStyle:
+                    Theme.of(context).textTheme.headlineMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                 hintText: 'Notes',
                 labelText: 'Notes',
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                   borderSide: BorderSide(color: Colors.grey),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
-                  borderSide:
-                      BorderSide(color: Theme.of(context).colorScheme.primary),
+                  borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -452,7 +472,6 @@ class _PointOfTripScreenState extends State<PointOfTripScreen> {
           widget.trip!.id!,
           tripPoint,
         );
-        print('Point ID: $pointId');
 
         if (pointId == null) {
           ScaffoldMessenger.of(context).showSnackBar(
