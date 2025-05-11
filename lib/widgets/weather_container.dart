@@ -42,9 +42,9 @@ class _WeatherContainerState extends State<WeatherContainer> {
 
     final now = DateTime.now();
     final startDate = tripPoint.startDate;
-    
-    targetDate = startDate.isBefore(DateTime(now.year, now.month, now.day)) 
-        ? now 
+
+    targetDate = startDate.isBefore(DateTime(now.year, now.month, now.day))
+        ? now
         : startDate;
 
     if (targetDate!.difference(now).inDays > 5) {
@@ -105,23 +105,22 @@ class _WeatherContainerState extends State<WeatherContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8.0),
-      width: 120,
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+      width: 100,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(150),
-        //       gradient: const LinearGradient(
-        //   colors: [
-        //   Color.fromARGB(255, 209, 228, 240), // jasny niebieski
-        //   Color.fromARGB(255, 210, 216, 89),
-        //   ],
-        //   begin: Alignment.topLeft,
-        //   end: Alignment.bottomRight,
-        // ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.onSurface.withAlpha(50),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary,
+          color: Theme.of(context).colorScheme.onSurface.withAlpha(50),
           width: 1,
         ),
+
       ),
       child: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -141,21 +140,16 @@ class _WeatherContainerState extends State<WeatherContainer> {
                         size: 64,
                       ),
                     ),
-                    const SizedBox(height: 8),
                     Text(
                       '${weatherData!.temperature.currentTemperature.round()}°C',
                       style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.bold,
+                          Theme.of(context).textTheme.bodyLarge?.copyWith(
                               ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
                       _getDisplayDate(targetDate!),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],

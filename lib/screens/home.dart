@@ -30,10 +30,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Travels'),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         actions: [],
       ),
       drawer: MainDrawer(),
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: TripListBuilder(
         firestoreService: firestoreService,
       ),
