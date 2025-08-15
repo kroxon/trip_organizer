@@ -30,10 +30,4 @@ Trip Organizer is designed to help travelers plan, organize, and manage their jo
 
 ## Screenshots
 
-![App Screenshot](assets/images/image.png)
-![App Screenshot](assets/images/image2.png)
-![App Screenshot](assets/images/image4.png)
-![App Screenshot](assets/images/image3.png)
-![App Screenshot](assets/images/image5.png)
-![App Screenshot](assets/images/image6.png)
-![App Screenshot](assets/images/image7.png)
+<img width="1195" height="640" alt="image" src="https://github.com/user-attachments/assets/6229f4c8-fd69-4933-8f32-21c9f301068e" />
